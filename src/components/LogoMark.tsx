@@ -1,0 +1,14 @@
+export default function LogoMark({ size = 30 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M16 2 L28 7 V15 C28 22.5 22.8 27.8 16 30 C9.2 27.8 4 22.5 4 15 V7 Z"
+        fill="#1c1a17"
+      />
+      <path
+        d="M16.4 8.5c1 2.2-1.4 3-1.4 5.3 0 1.4 1 2.3 2.1 2.3 1.5 0 2.5-1.3 2.3-2.8 1.6 1.2 2.6 3.1 2.6 5.1 0 3.4-2.7 5.6-6 5.6s-6-2.4-6-5.7c0-4 3.6-5.6 4.6-9.2.4 0 1.4.6 1.8 1.2Z"
+        fill="#e8432e"
+      />
+    </svg>
+  );
+}
