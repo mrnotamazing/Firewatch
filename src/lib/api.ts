@@ -1,5 +1,9 @@
 import type { HazardReport, ReportStatus } from './types';
 
+// In production the frontend (GoDaddy) and backend (Render) live on different domains,
+// so API calls need the full backend URL. Locally, Vite's dev proxy handles relative /api paths.
+const API_BASE = import.meta.env.VITE_API_URL ?? '';
+
 const OFFICER_TOKEN_KEY = 'firewatch-officer-token';
 
 export function getOfficerToken(): string | null {
@@ -25,13 +29,13 @@ async function json<T>(res: Response): Promise<T> {
 }
 
 export function fetchReports(): Promise<HazardReport[]> {
-  return fetch('/api/reports').then((res) => json<HazardReport[]>(res));
+  return fetch(`${API_BASE}/api/reports`).then((res) => json<HazardReport[]>(res));
 }
 
 export function createReport(
   payload: Omit<HazardReport, 'id' | 'status' | 'createdAt' | 'dueAt'>,
 ): Promise<HazardReport> {
-  return fetch('/api/reports', {
+  return fetch(`${API_BASE}/api/reports`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -39,7 +43,7 @@ export function createReport(
 }
 
 export function updateReportStatus(id: string, status: ReportStatus): Promise<HazardReport> {
-  return fetch(`/api/reports/${id}`, {
+  return fetch(`${API_BASE}/api/reports/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify({ status }),
@@ -47,14 +51,14 @@ export function updateReportStatus(id: string, status: ReportStatus): Promise<Ha
 }
 
 export function sendTicketEmail(id: string): Promise<{ sentAt: number; recipient: string; simulated: boolean }> {
-  return fetch(`/api/reports/${id}/send-ticket`, {
+  return fetch(`${API_BASE}/api/reports/${id}/send-ticket`, {
     method: 'POST',
     headers: authHeaders(),
   }).then((res) => json(res));
 }
 
 export async function officerLogin(passcode: string): Promise<boolean> {
-  const res = await fetch('/api/officer/login', {
+  const res = await fetch(`${API_BASE}/api/officer/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ passcode }),
@@ -68,7 +72,7 @@ export async function officerLogin(passcode: string): Promise<boolean> {
 export async function officerCheckSession(): Promise<boolean> {
   const token = getOfficerToken();
   if (!token) return false;
-  const res = await fetch('/api/officer/me', { headers: authHeaders() });
+  const res = await fetch(`${API_BASE}/api/officer/me`, { headers: authHeaders() });
   if (!res.ok) return false;
   const { authenticated } = await res.json();
   if (!authenticated) setOfficerToken(null);
@@ -76,6 +80,6 @@ export async function officerCheckSession(): Promise<boolean> {
 }
 
 export async function officerLogout(): Promise<void> {
-  await fetch('/api/officer/logout', { method: 'POST', headers: authHeaders() }).catch(() => {});
+  await fetch(`${API_BASE}/api/officer/logout`, { method: 'POST', headers: authHeaders() }).catch(() => {});
   setOfficerToken(null);
 }
