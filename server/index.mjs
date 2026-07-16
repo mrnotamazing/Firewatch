@@ -148,6 +148,6 @@ if (existsSync(distDir)) {
 }
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`FireWatch API listening on http://localhost:${PORT}`);
 });
