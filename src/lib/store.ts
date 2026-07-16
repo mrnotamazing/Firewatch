@@ -4,8 +4,6 @@ import { fetchReports, createReport, updateReportStatus, sendTicketEmail } from 
 
 interface HazardStore {
   reports: HazardReport[];
-  loading: boolean;
-  error: string | null;
   init: () => Promise<void>;
   addReport: (report: Omit<HazardReport, 'id' | 'status' | 'createdAt' | 'dueAt'>) => Promise<HazardReport>;
   setStatus: (id: string, status: ReportStatus) => Promise<void>;
@@ -14,18 +12,15 @@ interface HazardStore {
 
 export const useHazardStore = create<HazardStore>()((set) => ({
   reports: [],
-  loading: true,
-  error: null,
 
+  // Fetches quietly in the background — pages render immediately with whatever data is
+  // available (initially none), rather than blocking on a possibly-slow cold backend.
   init: async () => {
-    set({ loading: true, error: null });
     try {
       const reports = await fetchReports();
-      set({ reports, loading: false });
+      set({ reports });
     } catch {
-      // The heatmap, gallery, and quiz all work fine with zero live reports — only degrade
-      // report submission and the officer dashboard, rather than blocking the whole site.
-      set({ reports: [], loading: false, error: 'offline' });
+      // Heatmap, gallery, and quiz all work fine with zero live reports.
     }
   },
 
