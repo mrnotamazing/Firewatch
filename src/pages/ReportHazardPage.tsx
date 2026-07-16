@@ -244,7 +244,7 @@ export default function ReportHazardPage() {
                       <span className="font-mono text-[11.5px] uppercase tracking-wide">Add a photo</span>
                     </button>
                   )}
-                  <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={handlePhoto} className="hidden" />
+                  <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhoto} className="hidden" />
                 </div>
 
                 <div>
