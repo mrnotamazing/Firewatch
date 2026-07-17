@@ -111,7 +111,7 @@ export default function GalleryPage() {
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           {CASES.map((c) => (
-            <div key={c.id} className="border border-ink transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <div key={c.id} className="border border-ink transition-all duration-500 hover:-translate-y-1 hover:shadow-md">
               <div className="flex items-center justify-between border-b border-ink bg-paper-2 px-4 py-2.5">
                 <span className="font-mono text-[11px] font-semibold uppercase tracking-wide text-ink/60">{c.category}</span>
                 {c.sample ? (

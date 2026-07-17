@@ -127,7 +127,7 @@ export default function HomePage() {
             {HOW_IT_WORKS.map((step, i) => {
               const Icon = step.icon;
               return (
-                <div key={step.title} className="border border-line p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+                <div key={step.title} className="border border-line p-5 transition-all duration-500 hover:-translate-y-1 hover:shadow-md">
                   <div className="mb-3 flex items-center justify-between">
                     <span className="flex h-10 w-10 items-center justify-center border border-ember/30 bg-ember-soft text-ember">
                       <Icon size={18} />
@@ -153,7 +153,7 @@ export default function HomePage() {
             </h2>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Link to="/heatmap" className="group flex flex-col justify-between border border-ink bg-paper p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <Link to="/heatmap" className="group flex flex-col justify-between border border-ink bg-paper p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-md">
               <div>
                 <span className="flex h-11 w-11 items-center justify-center border border-ink bg-ink text-paper"><MapPin size={19} /></span>
                 <h3 className="mt-4 font-display text-[20px] font-bold uppercase text-ink">Fire Safety Heatmap</h3>
@@ -167,7 +167,7 @@ export default function HomePage() {
               </span>
             </Link>
 
-            <Link to="/report" className="group flex flex-col justify-between border border-ink bg-paper p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <Link to="/report" className="group flex flex-col justify-between border border-ink bg-paper p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-md">
               <div>
                 <span className="flex h-11 w-11 items-center justify-center border border-ember bg-ember text-paper"><Camera size={19} /></span>
                 <h3 className="mt-4 font-display text-[20px] font-bold uppercase text-ink">Report a Hazard</h3>
@@ -181,7 +181,7 @@ export default function HomePage() {
               </span>
             </Link>
 
-            <Link to="/accountability" className="group flex flex-col justify-between border border-ink bg-paper p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <Link to="/accountability" className="group flex flex-col justify-between border border-ink bg-paper p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-md">
               <div>
                 <span className="flex h-11 w-11 items-center justify-center border border-ink bg-ink text-paper"><ShieldCheck size={19} /></span>
                 <h3 className="mt-4 font-display text-[20px] font-bold uppercase text-ink">Department Accountability</h3>
@@ -195,7 +195,7 @@ export default function HomePage() {
               </span>
             </Link>
 
-            <Link to="/gallery" className="group flex flex-col justify-between border border-ink bg-paper p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <Link to="/gallery" className="group flex flex-col justify-between border border-ink bg-paper p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-md">
               <div>
                 <span className="flex h-11 w-11 items-center justify-center border border-ink bg-ink text-paper"><Images size={19} /></span>
                 <h3 className="mt-4 font-display text-[20px] font-bold uppercase text-ink">Before &amp; After Gallery</h3>

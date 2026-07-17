@@ -96,6 +96,36 @@ function FunFactCard() {
   );
 }
 
+function AnswerBar({ yesPct, total, mine }: { yesPct: number; total: number; mine: 'yes' | 'no' }) {
+  const target = Math.max(yesPct, 6);
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setDisplay(target));
+    return () => cancelAnimationFrame(raf);
+  }, [target]);
+
+  return (
+    <div className="mt-2.5">
+      <div className="flex h-5 w-full overflow-hidden border border-ink/15">
+        <div
+          className="flex items-center justify-center bg-safe font-mono text-[10px] font-bold text-paper transition-all duration-1000 ease-out"
+          style={{ width: `${display}%` }}
+        >
+          {display >= 12 && yesPct >= 12 && `${yesPct}%`}
+        </div>
+        <div className="flex flex-1 items-center justify-center bg-high-risk/70 font-mono text-[10px] font-bold text-paper transition-all duration-1000 ease-out">
+          {100 - display >= 12 && 100 - yesPct >= 12 && `${100 - yesPct}%`}
+        </div>
+      </div>
+      <div className="mt-1 flex items-center justify-between font-mono text-[10px] uppercase tracking-wide text-ink/45">
+        <span>{yesPct}% Yes · {100 - yesPct}% No</span>
+        <span>{total} response{total === 1 ? '' : 's'} · you said {mine}</span>
+      </div>
+    </div>
+  );
+}
+
 function SelfAssessment() {
   const [answered, setAnswered] = useState<Record<string, 'yes' | 'no'>>({});
   const [results, setResults] = useState<PollResults>({});
@@ -183,20 +213,7 @@ function SelfAssessment() {
                   </button>
                 </div>
               ) : (
-                <div className="mt-2.5">
-                  <div className="flex h-5 w-full overflow-hidden border border-ink/15">
-                    <div className="flex items-center justify-center bg-safe font-mono text-[10px] font-bold text-paper" style={{ width: `${Math.max(yesPct, 6)}%` }}>
-                      {yesPct >= 12 && `${yesPct}%`}
-                    </div>
-                    <div className="flex flex-1 items-center justify-center bg-high-risk/70 font-mono text-[10px] font-bold text-paper">
-                      {100 - yesPct >= 12 && `${100 - yesPct}%`}
-                    </div>
-                  </div>
-                  <div className="mt-1 flex items-center justify-between font-mono text-[10px] uppercase tracking-wide text-ink/45">
-                    <span>{yesPct}% Yes · {100 - yesPct}% No</span>
-                    <span>{total} response{total === 1 ? '' : 's'} · you said {mine}</span>
-                  </div>
-                </div>
+                <AnswerBar yesPct={yesPct} total={total} mine={mine} />
               )}
             </div>
           );
@@ -345,15 +362,15 @@ function SuggestionsTrigger() {
       <div className="fixed bottom-5 right-5 z-40 sm:bottom-6 sm:right-6">
         <button
           onClick={() => setOpen(true)}
-          className={`flex items-center overflow-hidden border border-ink bg-paper text-left shadow-lg transition-all duration-700 ease-in-out hover:bg-paper-2 ${
+          className={`flex items-center overflow-hidden border border-ink bg-paper text-left shadow-lg transition-all duration-1000 ease-in-out hover:bg-paper-2 ${
             scrolling ? 'h-11 w-11 justify-center gap-0 p-0' : 'w-[220px] gap-2.5 py-3 pl-4 pr-6'
           }`}
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-ember/40 bg-ember-soft text-ember transition-all duration-700 ease-in-out">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-ember/40 bg-ember-soft text-ember transition-all duration-1000 ease-in-out">
             <MessageSquarePlus size={16} />
           </span>
           <span
-            className={`overflow-hidden font-display text-[13px] font-bold uppercase leading-snug text-ink transition-all duration-700 ease-in-out ${
+            className={`overflow-hidden font-display text-[13px] font-bold uppercase leading-snug text-ink transition-all duration-1000 ease-in-out ${
               scrolling ? 'w-0 opacity-0' : 'w-[160px] opacity-100'
             }`}
           >
@@ -367,7 +384,7 @@ function SuggestionsTrigger() {
           }}
           aria-label="Dismiss suggestions prompt"
           tabIndex={scrolling ? -1 : 0}
-          className={`absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border border-ink/25 bg-paper text-ink/50 shadow transition-all duration-700 ease-in-out hover:text-ink ${
+          className={`absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border border-ink/25 bg-paper text-ink/50 shadow transition-all duration-1000 ease-in-out hover:text-ink ${
             scrolling ? 'pointer-events-none scale-75 opacity-0' : 'scale-100 opacity-100'
           }`}
         >
