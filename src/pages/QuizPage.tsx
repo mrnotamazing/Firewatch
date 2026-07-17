@@ -370,7 +370,11 @@ function SuggestionsTrigger() {
             <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-ember/40 bg-ember-soft text-ember">
               <MessageSquarePlus size={16} />
             </span>
-            <span className="w-[160px] shrink-0 font-display text-[13px] font-bold uppercase leading-snug text-ink">
+            <span
+              className={`shrink-0 overflow-hidden font-display text-[13px] font-bold uppercase leading-snug text-ink transition-all duration-1000 ease-in-out ${
+                scrolling ? 'w-0 opacity-0' : 'w-[160px] opacity-100'
+              }`}
+            >
               Help Bengaluru get more fire-safe
             </span>
           </button>
