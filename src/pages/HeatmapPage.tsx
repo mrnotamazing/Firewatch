@@ -22,11 +22,25 @@ const RISK_FILTERS: { id: RiskBand | 'all'; label: string }[] = [
 
 const TYPE_FILTERS = ['All Types', 'residential', 'commercial', 'industrial', 'mixed'] as const;
 
+const DENSITY_FILTERS: { id: 'all' | 'low' | 'medium' | 'high'; label: string }[] = [
+  { id: 'all', label: 'All Densities' },
+  { id: 'low', label: 'Low (<12k/km²)' },
+  { id: 'medium', label: 'Medium (12k–18k/km²)' },
+  { id: 'high', label: 'High (18k+/km²)' },
+];
+
+function densityBand(perSqKm: number): 'low' | 'medium' | 'high' {
+  if (perSqKm < 12000) return 'low';
+  if (perSqKm <= 18000) return 'medium';
+  return 'high';
+}
+
 export default function HeatmapPage() {
   const reports = useHazardStore((s) => s.reports);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState<(typeof TYPE_FILTERS)[number]>('All Types');
   const [riskFilter, setRiskFilter] = useState<RiskBand | 'all'>('all');
+  const [densityFilter, setDensityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mapMode, setMapMode] = useState<MapMode>('markers');
   // Both side panels default open on tablet/desktop, but start closed on phones so the map itself
@@ -36,6 +50,17 @@ export default function HeatmapPage() {
   const [controlsOpen, setControlsOpen] = useState(isDesktop);
   const [searchNote, setSearchNote] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
+  const [sortKey, setSortKey] = useState<'score' | 'name' | 'density'>('score');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+  function toggleSort(key: typeof sortKey) {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  }
 
   // Selecting a locality always reveals the detail panel, even if the user had collapsed it.
   function handleSelect(id: string | null) {
@@ -54,12 +79,25 @@ export default function HeatmapPage() {
         if (search && !s.locality.name.toLowerCase().includes(search.toLowerCase())) return false;
         if (typeFilter !== 'All Types' && s.locality.type !== typeFilter) return false;
         if (riskFilter !== 'all' && s.band !== riskFilter) return false;
+        if (densityFilter !== 'all' && densityBand(s.locality.populationDensityPerSqKm) !== densityFilter) return false;
         return true;
       }),
-    [allStats, search, typeFilter, riskFilter],
+    [allStats, search, typeFilter, riskFilter, densityFilter],
   );
 
   const selected = allStats.find((s) => s.locality.id === selectedId) ?? null;
+
+  const tableStats = useMemo(() => {
+    const arr = [...filteredStats];
+    arr.sort((a, b) => {
+      let cmp = 0;
+      if (sortKey === 'score') cmp = a.safetyScore - b.safetyScore;
+      else if (sortKey === 'name') cmp = a.locality.name.localeCompare(b.locality.name);
+      else cmp = a.locality.populationDensityPerSqKm - b.locality.populationDensityPerSqKm;
+      return sortDir === 'asc' ? cmp : -cmp;
+    });
+    return arr;
+  }, [filteredStats, sortKey, sortDir]);
 
   /** Enter in the search box: if the text matches no scored locality, geocode it and snap to the nearest one. */
   async function handleSearchSubmit() {
@@ -131,7 +169,8 @@ export default function HeatmapPage() {
         </p>
       </div>
 
-      <div className="relative h-[80vh] min-h-[580px] w-full border-b border-ink">
+      <div className="border-b border-ink bg-paper-2 px-4 py-6 sm:px-10 sm:py-10 lg:px-16">
+      <div className="relative mx-auto h-[70vh] min-h-[480px] w-full max-w-[1400px] border border-ink shadow-md">
         <HeatmapMap stats={filteredStats} selectedId={selectedId} onSelect={handleSelect} mode={mapMode} />
 
         {controlsOpen ? (
@@ -190,6 +229,15 @@ export default function HeatmapPage() {
                 ))}
               </select>
             </div>
+            <select
+              value={densityFilter}
+              onChange={(e) => setDensityFilter(e.target.value as typeof densityFilter)}
+              className="w-full border border-line bg-paper px-2.5 py-1.5 text-[12px] text-ink shadow-md focus:border-ink focus:outline-none"
+            >
+              {DENSITY_FILTERS.map((d) => (
+                <option key={d.id} value={d.id}>{d.label}</option>
+              ))}
+            </select>
             <div className="flex border border-line bg-paper shadow-md">
               <button
                 onClick={() => setMapMode('markers')}
@@ -308,6 +356,7 @@ export default function HeatmapPage() {
           </button>
         )}
       </div>
+      </div>
 
       <section className="mx-auto max-w-[1500px] px-6 py-8">
         <div className="mb-3 flex items-center justify-between">
@@ -319,16 +368,23 @@ export default function HeatmapPage() {
           <table className="w-full min-w-[720px] border-collapse text-left">
             <thead>
               <tr className="border-b border-ink bg-paper-2 font-mono text-[10.5px] uppercase tracking-wide text-ink/55">
-                <th className="px-4 py-2.5 font-medium">Score</th>
-                <th className="px-4 py-2.5 font-medium">Locality</th>
+                <th className="cursor-pointer select-none px-4 py-2.5 font-medium hover:text-ink" onClick={() => toggleSort('score')}>
+                  Score {sortKey === 'score' && (sortDir === 'asc' ? '↑' : '↓')}
+                </th>
+                <th className="cursor-pointer select-none px-4 py-2.5 font-medium hover:text-ink" onClick={() => toggleSort('name')}>
+                  Locality {sortKey === 'name' && (sortDir === 'asc' ? '↑' : '↓')}
+                </th>
                 <th className="px-4 py-2.5 font-medium">Type</th>
+                <th className="cursor-pointer select-none px-4 py-2.5 font-medium hover:text-ink" onClick={() => toggleSort('density')}>
+                  Density {sortKey === 'density' && (sortDir === 'asc' ? '↑' : '↓')}
+                </th>
                 <th className="px-4 py-2.5 font-medium">Active</th>
                 <th className="px-4 py-2.5 font-medium">Pending</th>
                 <th className="px-4 py-2.5 font-medium">Risk Band</th>
               </tr>
             </thead>
             <tbody>
-              {filteredStats.map((s) => (
+              {tableStats.map((s) => (
                 <tr
                   key={s.locality.id}
                   onClick={() => handleSelect(s.locality.id)}
@@ -341,6 +397,7 @@ export default function HeatmapPage() {
                   </td>
                   <td className="px-4 py-2.5 font-medium text-ink">{s.locality.name}</td>
                   <td className="px-4 py-2.5 capitalize text-ink/60">{s.locality.type}</td>
+                  <td className="px-4 py-2.5 font-mono text-ink/70">{s.locality.populationDensityPerSqKm.toLocaleString('en-IN')}/km²</td>
                   <td className="px-4 py-2.5 font-mono text-ink/70">{s.activeHazards}</td>
                   <td className="px-4 py-2.5 font-mono text-ink/70">{s.pendingHazards}</td>
                   <td className="px-4 py-2.5"><RiskBadge band={s.band} /></td>

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import TopBar from './components/TopBar';
 import Header from './components/Header';
 import PurposeBanner from './components/PurposeBanner';
+import ScrollToTop from './components/ScrollToTop';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
 import HeatmapPage from './pages/HeatmapPage';
@@ -22,6 +23,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <TopBar />
       <Header />
       <PurposeBanner />

@@ -31,6 +31,12 @@ const FLAME_GLYPH = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none"
 const CROSS_GLYPH = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 2h4v8h8v4h-8v8h-4v-8H2v-4h8V2Z" fill="#f3efe4"/></svg>`;
 const SHIELD_GLYPH = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2 20 5.5v6c0 6-3.4 9.8-8 10.5-4.6-.7-8-4.5-8-10.5v-6L12 2Z" fill="#f3efe4"/></svg>`;
 
+/** Opens Google's own listing for a named place — surfaces real phone number, address,
+ * and directions without FireWatch needing to maintain that contact data itself. */
+function googleMapsUrl(name: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name}, Bengaluru`)}`;
+}
+
 const fireIcon = pinIcon('#c0392b', FLAME_GLYPH);
 const hospitalIcon = pinIcon('#2563a8', CROSS_GLYPH);
 const policeIcon = pinIcon('#1d3557', SHIELD_GLYPH);
@@ -179,6 +185,14 @@ export default function HeatmapMap({
             <div className="px-3 py-2 font-sans">
               <div className="font-mono text-[10px] font-semibold uppercase tracking-wide text-station">Fire Station</div>
               <div className="mt-0.5 text-[13px] font-semibold text-ink">{fs.name}</div>
+              <a
+                href={googleMapsUrl(fs.name)}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-1.5 inline-block font-mono text-[10.5px] font-semibold uppercase tracking-wide text-ember hover:text-ember-2"
+              >
+                Get Directions →
+              </a>
             </div>
           </Popup>
         </Marker>
@@ -191,6 +205,14 @@ export default function HeatmapMap({
               <div className="px-3 py-2 font-sans">
                 <div className="font-mono text-[10px] font-semibold uppercase tracking-wide text-high-risk">Hospital</div>
                 <div className="mt-0.5 text-[13px] font-semibold text-ink">{h.name}</div>
+                <a
+                  href={googleMapsUrl(h.name)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-1.5 inline-block font-mono text-[10.5px] font-semibold uppercase tracking-wide text-ember hover:text-ember-2"
+                >
+                  Get Directions →
+                </a>
               </div>
             </Popup>
           </Marker>
@@ -202,6 +224,14 @@ export default function HeatmapMap({
               <div className="px-3 py-2 font-sans">
                 <div className="font-mono text-[10px] font-semibold uppercase tracking-wide text-ink/70">Police Station</div>
                 <div className="mt-0.5 text-[13px] font-semibold text-ink">{p.name}</div>
+                <a
+                  href={googleMapsUrl(p.name)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-1.5 inline-block font-mono text-[10.5px] font-semibold uppercase tracking-wide text-ember hover:text-ember-2"
+                >
+                  Get Directions →
+                </a>
               </div>
             </Popup>
           </Marker>
