@@ -322,6 +322,21 @@ function SuggestionsModal({ onClose }: { onClose: () => void }) {
 function SuggestionsTrigger() {
   const [open, setOpen] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [scrolling, setScrolling] = useState(false);
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+    function handleScroll() {
+      setScrolling(true);
+      clearTimeout(timeout);
+      timeout = setTimeout(() => setScrolling(false), 500);
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeout);
+    };
+  }, []);
 
   if (dismissed) return null;
 
@@ -330,25 +345,35 @@ function SuggestionsTrigger() {
       <div className="fixed bottom-5 right-5 z-40 sm:bottom-6 sm:right-6">
         <button
           onClick={() => setOpen(true)}
-          className="flex max-w-[220px] items-center gap-2.5 border border-ink bg-paper py-3 pl-4 pr-6 text-left shadow-lg hover:bg-paper-2 sm:max-w-none"
+          className={`flex items-center border border-ink bg-paper text-left shadow-lg transition-all duration-200 hover:bg-paper-2 ${
+            scrolling ? 'h-11 w-11 justify-center gap-0 p-0' : 'max-w-[220px] gap-2.5 py-3 pl-4 pr-6 sm:max-w-none'
+          }`}
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-ember/40 bg-ember-soft text-ember">
+          <span
+            className={`flex h-8 w-8 shrink-0 items-center justify-center text-ember transition-all duration-200 ${
+              scrolling ? '' : 'border border-ember/40 bg-ember-soft'
+            }`}
+          >
             <MessageSquarePlus size={16} />
           </span>
-          <span className="font-display text-[13px] font-bold uppercase leading-snug text-ink">
-            Help Bengaluru get more fire-safe
-          </span>
+          {!scrolling && (
+            <span className="font-display text-[13px] font-bold uppercase leading-snug text-ink">
+              Help Bengaluru get more fire-safe
+            </span>
+          )}
         </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setDismissed(true);
-          }}
-          aria-label="Dismiss suggestions prompt"
-          className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border border-ink/25 bg-paper text-ink/50 shadow hover:text-ink"
-        >
-          <X size={11} />
-        </button>
+        {!scrolling && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setDismissed(true);
+            }}
+            aria-label="Dismiss suggestions prompt"
+            className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border border-ink/25 bg-paper text-ink/50 shadow hover:text-ink"
+          >
+            <X size={11} />
+          </button>
+        )}
       </div>
       {open && <SuggestionsModal onClose={() => setOpen(false)} />}
     </>
