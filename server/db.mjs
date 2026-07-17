@@ -31,6 +31,23 @@ if (!existingColumns.has('ticketRecipient')) {
   db.exec('ALTER TABLE reports ADD COLUMN ticketRecipient TEXT');
 }
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS suggestions (
+    id TEXT PRIMARY KEY,
+    message TEXT NOT NULL,
+    createdAt INTEGER NOT NULL
+  )
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS poll_responses (
+    id TEXT PRIMARY KEY,
+    questionId TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    createdAt INTEGER NOT NULL
+  )
+`);
+
 export function rowToReport(row) {
   return {
     id: row.id,

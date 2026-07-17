@@ -8,7 +8,7 @@ const navItems = [
   { to: '/report', label: 'Report Hazard' },
   { to: '/accountability', label: 'Accountability' },
   { to: '/gallery', label: 'Gallery' },
-  { to: '/quiz', label: 'Quiz' },
+  { to: '/quiz', label: "While You're At It" },
 ];
 
 export default function Header() {

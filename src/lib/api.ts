@@ -83,3 +83,25 @@ export async function officerLogout(): Promise<void> {
   await fetch(`${API_BASE}/api/officer/logout`, { method: 'POST', headers: authHeaders() }).catch(() => {});
   setOfficerToken(null);
 }
+
+export function submitSuggestion(message: string): Promise<{ id: string; message: string; createdAt: number }> {
+  return fetch(`${API_BASE}/api/suggestions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message }),
+  }).then((res) => json(res));
+}
+
+export type PollResults = Record<string, { yes: number; no: number }>;
+
+export function fetchPollResults(): Promise<PollResults> {
+  return fetch(`${API_BASE}/api/poll`).then((res) => json<PollResults>(res));
+}
+
+export function submitPollAnswer(questionId: string, answer: 'yes' | 'no'): Promise<void> {
+  return fetch(`${API_BASE}/api/poll`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ questionId, answer }),
+  }).then((res) => json(res)).then(() => undefined);
+}

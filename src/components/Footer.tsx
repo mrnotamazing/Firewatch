@@ -19,7 +19,7 @@ export default function Footer() {
           <Link to="/report" className="hover:text-ink">Report Hazard</Link>
           <Link to="/accountability" className="hover:text-ink">Accountability</Link>
           <Link to="/gallery" className="hover:text-ink">Gallery</Link>
-          <Link to="/quiz" className="hover:text-ink">Quiz</Link>
+          <Link to="/quiz" className="hover:text-ink">While You're At It</Link>
           <Link to="/dashboard" className="flex items-center gap-1 hover:text-ink">
             <Lock size={10} /> Officer Login
           </Link>

@@ -133,6 +133,45 @@ app.post('/api/reports/:id/send-ticket', requireOfficer, async (req, res) => {
   res.json({ sentAt: ticketSentAt, recipient, simulated: result.simulated });
 });
 
+app.post('/api/suggestions', (req, res) => {
+  const { message } = req.body;
+  if (!message || !message.trim()) {
+    res.status(400).json({ error: 'Message is required' });
+    return;
+  }
+  const id = `SUG-${Date.now()}`;
+  const createdAt = Date.now();
+  const trimmed = message.trim().slice(0, 2000);
+  db.prepare('INSERT INTO suggestions (id, message, createdAt) VALUES (?, ?, ?)').run(id, trimmed, createdAt);
+  res.status(201).json({ id, message: trimmed, createdAt });
+});
+
+app.get('/api/suggestions', requireOfficer, (_req, res) => {
+  const rows = db.prepare('SELECT * FROM suggestions ORDER BY createdAt DESC').all();
+  res.json(rows);
+});
+
+app.post('/api/poll', (req, res) => {
+  const { questionId, answer } = req.body;
+  if (!questionId || (answer !== 'yes' && answer !== 'no')) {
+    res.status(400).json({ error: 'questionId and answer ("yes" or "no") are required' });
+    return;
+  }
+  const id = `POLL-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  db.prepare('INSERT INTO poll_responses (id, questionId, answer, createdAt) VALUES (?, ?, ?, ?)').run(id, questionId, answer, Date.now());
+  res.status(201).json({ ok: true });
+});
+
+app.get('/api/poll', (_req, res) => {
+  const rows = db.prepare('SELECT questionId, answer, COUNT(*) as count FROM poll_responses GROUP BY questionId, answer').all();
+  const result = {};
+  for (const r of rows) {
+    if (!result[r.questionId]) result[r.questionId] = { yes: 0, no: 0 };
+    result[r.questionId][r.answer] = r.count;
+  }
+  res.json(result);
+});
+
 // Serve the built frontend (dist/) when it exists, so one always-on process hosts the whole app.
 const distDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 if (existsSync(distDir)) {
