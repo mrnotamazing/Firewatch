@@ -68,8 +68,8 @@ export default function GalleryPage() {
     <div>
       {!bannerDismissed && (
         <div className="relative border-b border-ember/25 bg-ember/10 px-6 py-2.5">
-          <div className="mx-auto flex max-w-[1100px] items-center justify-center gap-2 pr-8 text-center">
-            <Info size={14} className="shrink-0 text-ember-2" />
+          <div className="mx-auto flex max-w-[1100px] items-start justify-center gap-2 pr-8 text-center">
+            <Info size={14} className="mt-0.5 shrink-0 text-ember-2" />
             <p className="font-mono text-[11.5px] font-medium leading-relaxed text-ember-2">
               Real photo testimonials of a fire-safer Bengaluru will be added here once the community and local
               authorities take visible action on reported hazards — until then, illustrations below stand in for
