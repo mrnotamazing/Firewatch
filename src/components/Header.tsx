@@ -20,7 +20,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-[1500px] items-center justify-between px-4 py-3 sm:px-6">
         <NavLink to="/" className="flex items-center gap-2 sm:gap-2.5" onClick={() => setMenuOpen(false)}>
           <LogoMark size={26} />
-          <span className="flex flex-col items-start justify-center">
+          <span className="flex flex-col items-end justify-center">
             <span className="font-display text-[21px] font-bold uppercase leading-none tracking-tight text-ink sm:text-[26px]">
               FireWatch
             </span>

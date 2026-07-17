@@ -325,18 +325,14 @@ function SuggestionsTrigger() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex w-full items-center gap-3 border border-ink bg-paper-2 p-5 text-left hover:bg-paper"
+        className="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 border border-ink bg-ink px-4 py-3 text-left shadow-lg hover:bg-ink/90 sm:bottom-6 sm:right-6"
       >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-ember/30 bg-ember-soft text-ember">
-          <MessageSquarePlus size={18} />
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-ember/40 bg-ember-soft text-ember">
+          <MessageSquarePlus size={16} />
         </span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-mono text-[10.5px] font-semibold uppercase tracking-wide text-ink/45">Your Voice</span>
-          <span className="block font-display text-[16px] font-bold uppercase leading-snug text-ink">
-            Suggestions to make India more fire-safe?
-          </span>
+        <span className="hidden font-display text-[13px] font-bold uppercase leading-snug text-paper sm:block">
+          Suggestions?
         </span>
-        <span className="shrink-0 font-mono text-[11px] font-semibold uppercase tracking-wide text-ember">Share →</span>
       </button>
       {open && <SuggestionsModal onClose={() => setOpen(false)} />}
     </>
@@ -364,8 +360,9 @@ export default function QuizPage() {
       <section className="mx-auto max-w-[760px] space-y-6 px-6 py-10">
         <FunFactCard />
         <SelfAssessment />
-        <SuggestionsTrigger />
       </section>
+
+      <SuggestionsTrigger />
     </div>
   );
 }
