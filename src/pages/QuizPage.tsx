@@ -329,7 +329,7 @@ function SuggestionsTrigger() {
     function handleScroll() {
       setScrolling(true);
       clearTimeout(timeout);
-      timeout = setTimeout(() => setScrolling(false), 500);
+      timeout = setTimeout(() => setScrolling(false), 900);
     }
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
@@ -345,35 +345,34 @@ function SuggestionsTrigger() {
       <div className="fixed bottom-5 right-5 z-40 sm:bottom-6 sm:right-6">
         <button
           onClick={() => setOpen(true)}
-          className={`flex items-center border border-ink bg-paper text-left shadow-lg transition-all duration-200 hover:bg-paper-2 ${
-            scrolling ? 'h-11 w-11 justify-center gap-0 p-0' : 'max-w-[220px] gap-2.5 py-3 pl-4 pr-6 sm:max-w-none'
+          className={`flex items-center overflow-hidden border border-ink bg-paper text-left shadow-lg transition-all duration-700 ease-in-out hover:bg-paper-2 ${
+            scrolling ? 'h-11 w-11 justify-center gap-0 p-0' : 'w-[220px] gap-2.5 py-3 pl-4 pr-6'
           }`}
         >
-          <span
-            className={`flex h-8 w-8 shrink-0 items-center justify-center text-ember transition-all duration-200 ${
-              scrolling ? '' : 'border border-ember/40 bg-ember-soft'
-            }`}
-          >
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-ember/40 bg-ember-soft text-ember transition-all duration-700 ease-in-out">
             <MessageSquarePlus size={16} />
           </span>
-          {!scrolling && (
-            <span className="font-display text-[13px] font-bold uppercase leading-snug text-ink">
-              Help Bengaluru get more fire-safe
-            </span>
-          )}
-        </button>
-        {!scrolling && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setDismissed(true);
-            }}
-            aria-label="Dismiss suggestions prompt"
-            className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border border-ink/25 bg-paper text-ink/50 shadow hover:text-ink"
+          <span
+            className={`overflow-hidden font-display text-[13px] font-bold uppercase leading-snug text-ink transition-all duration-700 ease-in-out ${
+              scrolling ? 'w-0 opacity-0' : 'w-[160px] opacity-100'
+            }`}
           >
-            <X size={11} />
-          </button>
-        )}
+            Help Bengaluru get more fire-safe
+          </span>
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setDismissed(true);
+          }}
+          aria-label="Dismiss suggestions prompt"
+          tabIndex={scrolling ? -1 : 0}
+          className={`absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border border-ink/25 bg-paper text-ink/50 shadow transition-all duration-700 ease-in-out hover:text-ink ${
+            scrolling ? 'pointer-events-none scale-75 opacity-0' : 'scale-100 opacity-100'
+          }`}
+        >
+          <X size={11} />
+        </button>
       </div>
       {open && <SuggestionsModal onClose={() => setOpen(false)} />}
     </>
