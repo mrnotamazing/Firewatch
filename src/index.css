@@ -91,3 +91,11 @@ body {
   background: var(--color-ember-soft);
   color: var(--color-ember-2);
 }
+
+/* When PrepareLocalityModal prints its sheet (via a portal to document.body), hide the
+   underlying app so only the portaled sheet content appears on the printed page. */
+@media print {
+  #root {
+    display: none !important;
+  }
+}

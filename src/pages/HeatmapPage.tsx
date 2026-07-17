@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Search, Camera, Database, MapPin, LayoutGrid, Waves, ShieldCheck, Images, PanelRightClose, PanelRightOpen, SlidersHorizontal, X } from 'lucide-react';
+import { Search, Camera, Database, MapPin, LayoutGrid, Waves, ShieldCheck, Images, PanelRightClose, PanelRightOpen, SlidersHorizontal, X, FileHeart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import HeatmapMap, { type MapMode } from '../components/HeatmapMap';
 import LocalityDetailPanel from '../components/LocalityDetailPanel';
+import PrepareLocalityModal from '../components/PrepareLocalityModal';
 import RiskBadge from '../components/RiskBadge';
 import StatCard from '../components/StatCard';
 import { useHazardStore } from '../lib/store';
@@ -50,6 +51,7 @@ export default function HeatmapPage() {
   const [controlsOpen, setControlsOpen] = useState(isDesktop);
   const [searchNote, setSearchNote] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
+  const [prepareOpen, setPrepareOpen] = useState(false);
   const [sortKey, setSortKey] = useState<'score' | 'name' | 'density'>('score');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
@@ -163,11 +165,21 @@ export default function HeatmapPage() {
             Fire Safety Heatmap
           </h1>
         </div>
-        <p className="max-w-sm text-[13px] leading-relaxed text-ink/55">
-          Real-time fire risk for every Bengaluru locality — powered by fire station proximity, reported hazards,
-          population density, and area type.
-        </p>
+        <div className="flex max-w-sm flex-col items-start gap-2.5 sm:items-end">
+          <p className="text-[13px] leading-relaxed text-ink/55">
+            Real-time fire risk for every Bengaluru locality — powered by fire station proximity, reported hazards,
+            population density, and area type.
+          </p>
+          <button
+            onClick={() => setPrepareOpen(true)}
+            className="flex items-center gap-1.5 bg-ink px-4 py-2 font-display text-[12.5px] font-semibold uppercase tracking-wide text-paper hover:bg-ink-2"
+          >
+            <FileHeart size={14} /> Prepare Your Locality
+          </button>
+        </div>
       </div>
+
+      {prepareOpen && <PrepareLocalityModal allStats={allStats} onClose={() => setPrepareOpen(false)} />}
 
       <div className="border-b border-ink bg-paper-2 px-4 py-6 sm:px-10 sm:py-10 lg:px-16">
       <div className="relative mx-auto h-[70vh] min-h-[480px] w-full max-w-[1400px] border border-ink shadow-md">
