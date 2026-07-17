@@ -364,7 +364,7 @@ function SuggestionsTrigger() {
           <button
             onClick={() => setOpen(true)}
             className={`flex items-center overflow-hidden border border-ink bg-paper text-left shadow-lg transition-all duration-1000 ease-in-out hover:bg-paper-2 ${
-              scrolling ? 'h-11 w-11 gap-0 p-0' : 'h-20 w-[220px] gap-2.5 py-3 pl-4 pr-6'
+              scrolling ? 'h-11 w-11 gap-0 p-[5px]' : 'h-20 w-[220px] gap-2.5 py-3 pl-4 pr-6'
             }`}
           >
             <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-ember/40 bg-ember-soft text-ember">
