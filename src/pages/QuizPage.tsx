@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import {
   Lightbulb, RefreshCw, ClipboardCheck, MessageSquarePlus, LoaderCircle,
-  ThumbsUp, ThumbsDown, Info, Check, Flame, ShieldAlert,
+  ThumbsUp, ThumbsDown, Info, Check, Flame, ShieldAlert, X, Globe2,
 } from 'lucide-react';
 import { submitSuggestion, submitPollAnswer, fetchPollResults, type PollResults } from '../lib/api';
 
@@ -225,7 +226,7 @@ const CATEGORIES: { id: 'fire-safety' | 'firewatch-idea'; label: string; icon: t
   },
 ];
 
-function SuggestionsBox() {
+function SuggestionsModal({ onClose }: { onClose: () => void }) {
   const [category, setCategory] = useState<'fire-safety' | 'firewatch-idea'>('firewatch-idea');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
@@ -246,61 +247,99 @@ function SuggestionsBox() {
     }
   }
 
-  return (
-    <div className="border border-ink">
-      <div className="flex items-center gap-2.5 border-b border-ink bg-paper-2 px-5 py-3.5">
-        <MessageSquarePlus size={18} className="text-ember" />
-        <div>
-          <div className="font-mono text-[10.5px] font-semibold uppercase tracking-wide text-ink/45">Your Voice</div>
-          <h3 className="font-display text-[16px] font-bold uppercase leading-none text-ink">Suggestions &amp; Ideas</h3>
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/60 p-4 py-10" onClick={onClose}>
+      <div className="w-full max-w-md border border-ink bg-paper shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between border-b border-ink/15 px-5 py-4">
+          <div>
+            <div className="font-mono text-[10px] font-medium uppercase tracking-wide text-ink/45">Your Voice</div>
+            <h2 className="font-display text-[18px] font-bold uppercase leading-none text-ink">Suggestions to Make India More Fire-Safe?</h2>
+          </div>
+          <button onClick={onClose} className="flex h-8 w-8 shrink-0 items-center justify-center border border-ink/20 text-ink/50 hover:bg-paper-2 hover:text-ink">
+            <X size={15} />
+          </button>
+        </div>
+
+        <div className="p-5">
+          {status === 'sent' ? (
+            <div className="flex items-center gap-2 border border-safe/30 bg-safe-soft px-4 py-3 text-[13px] text-safe">
+              <Check size={16} /> Thanks — your suggestion was recorded and will be reviewed.
+            </div>
+          ) : (
+            <>
+              <p className="mb-4 flex items-start gap-2 text-[12.5px] leading-relaxed text-ink/55">
+                <Globe2 size={14} className="mt-0.5 shrink-0 text-ember" />
+                FireWatch started right here in Bengaluru — the goal is to prove this accountability model works, then
+                take it to more Indian cities, and eventually beyond.
+              </p>
+              <form onSubmit={submit}>
+                <div className="mb-3 flex gap-2">
+                  {CATEGORIES.map((c) => {
+                    const Icon = c.icon;
+                    const isActive = c.id === category;
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => setCategory(c.id)}
+                        className={`flex flex-1 items-center justify-center gap-1.5 border px-2 py-2 font-mono text-[11px] font-semibold uppercase tracking-wide ${
+                          isActive ? 'border-ink bg-ink text-paper' : 'border-ink/20 text-ink/50 hover:border-ink/40'
+                        }`}
+                      >
+                        <Icon size={12} /> {c.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={active.placeholder}
+                  autoFocus
+                  rows={3}
+                  className="w-full border border-ink/25 bg-paper px-3.5 py-2.5 text-[13px] text-ink focus:border-ink focus:outline-none"
+                />
+                <div className="mt-2.5 flex items-center gap-3">
+                  <button
+                    type="submit"
+                    disabled={status === 'sending' || !message.trim()}
+                    className="flex items-center gap-1.5 bg-ink px-4 py-2 font-display text-[12.5px] font-semibold uppercase tracking-wide text-paper hover:bg-ink-2 disabled:opacity-40"
+                  >
+                    {status === 'sending' ? <LoaderCircle size={13} className="animate-spin" /> : 'Send'}
+                  </button>
+                  {status === 'error' && <span className="font-mono text-[11px] text-high-risk">Could not send — try again.</span>}
+                </div>
+              </form>
+            </>
+          )}
         </div>
       </div>
-      <div className="p-5">
-        {status === 'sent' ? (
-          <div className="flex items-center gap-2 border border-safe/30 bg-safe-soft px-4 py-3 text-[13px] text-safe">
-            <Check size={16} /> Thanks — your suggestion was recorded and will be reviewed.
-          </div>
-        ) : (
-          <form onSubmit={submit}>
-            <div className="mb-3 flex gap-2">
-              {CATEGORIES.map((c) => {
-                const Icon = c.icon;
-                const isActive = c.id === category;
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => setCategory(c.id)}
-                    className={`flex flex-1 items-center justify-center gap-1.5 border px-2 py-2 font-mono text-[11px] font-semibold uppercase tracking-wide ${
-                      isActive ? 'border-ink bg-ink text-paper' : 'border-ink/20 text-ink/50 hover:border-ink/40'
-                    }`}
-                  >
-                    <Icon size={12} /> {c.label}
-                  </button>
-                );
-              })}
-            </div>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={active.placeholder}
-              rows={3}
-              className="w-full border border-ink/25 bg-paper px-3.5 py-2.5 text-[13px] text-ink focus:border-ink focus:outline-none"
-            />
-            <div className="mt-2.5 flex items-center gap-3">
-              <button
-                type="submit"
-                disabled={status === 'sending' || !message.trim()}
-                className="flex items-center gap-1.5 bg-ink px-4 py-2 font-display text-[12.5px] font-semibold uppercase tracking-wide text-paper hover:bg-ink-2 disabled:opacity-40"
-              >
-                {status === 'sending' ? <LoaderCircle size={13} className="animate-spin" /> : 'Send'}
-              </button>
-              {status === 'error' && <span className="font-mono text-[11px] text-high-risk">Could not send — try again.</span>}
-            </div>
-          </form>
-        )}
-      </div>
-    </div>
+    </div>,
+    document.body,
+  );
+}
+
+function SuggestionsTrigger() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="flex w-full items-center gap-3 border border-ink bg-paper-2 p-5 text-left hover:bg-paper"
+      >
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-ember/30 bg-ember-soft text-ember">
+          <MessageSquarePlus size={18} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-mono text-[10.5px] font-semibold uppercase tracking-wide text-ink/45">Your Voice</span>
+          <span className="block font-display text-[16px] font-bold uppercase leading-snug text-ink">
+            Suggestions to make India more fire-safe?
+          </span>
+        </span>
+        <span className="shrink-0 font-mono text-[11px] font-semibold uppercase tracking-wide text-ember">Share →</span>
+      </button>
+      {open && <SuggestionsModal onClose={() => setOpen(false)} />}
+    </>
   );
 }
 
@@ -325,7 +364,7 @@ export default function QuizPage() {
       <section className="mx-auto max-w-[760px] space-y-6 px-6 py-10">
         <FunFactCard />
         <SelfAssessment />
-        <SuggestionsBox />
+        <SuggestionsTrigger />
       </section>
     </div>
   );
