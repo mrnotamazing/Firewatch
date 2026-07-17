@@ -3,9 +3,10 @@ import { NavLink } from 'react-router-dom';
 import { Camera, Lock, Menu, X } from 'lucide-react';
 import LogoMark from './LogoMark';
 
+// "Report Hazard" isn't repeated here — the standalone CTA button already covers it,
+// and duplicating it as a nav link was making the bar feel crowded.
 const navItems = [
   { to: '/heatmap', label: 'Heatmap' },
-  { to: '/report', label: 'Report Hazard' },
   { to: '/accountability', label: 'Accountability' },
   { to: '/gallery', label: 'Gallery' },
   { to: '/quiz', label: "While You're At It" },

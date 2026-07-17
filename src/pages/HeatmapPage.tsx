@@ -396,10 +396,33 @@ export default function HeatmapPage() {
                 <th className="cursor-pointer select-none px-4 py-2.5 font-medium hover:text-ink" onClick={() => toggleSort('name')}>
                   Locality {sortKey === 'name' && (sortDir === 'asc' ? '↑' : '↓')}
                 </th>
-                <th className="px-4 py-2.5 font-medium">Type</th>
+                <th className="px-2 py-1.5 font-medium">
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full cursor-pointer bg-transparent px-1.5 py-1 font-mono text-[10.5px] uppercase tracking-wide text-ink/55 hover:text-ink focus:outline-none"
+                  >
+                    {TYPE_FILTERS.map((t) => (
+                      <option key={t} value={t}>{t === 'All Types' ? 'Type' : `${t[0].toUpperCase()}${t.slice(1)}`}</option>
+                    ))}
+                  </select>
+                </th>
                 <th className="px-4 py-2.5 font-medium">Active</th>
                 <th className="px-4 py-2.5 font-medium">Pending</th>
-                <th className="px-4 py-2.5 font-medium">Risk Band</th>
+                <th className="px-2 py-1.5 font-medium">
+                  <select
+                    value={riskFilter}
+                    onChange={(e) => setRiskFilter(e.target.value as RiskBand | 'all')}
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-full cursor-pointer bg-transparent px-1.5 py-1 font-mono text-[10.5px] uppercase tracking-wide text-ink/55 hover:text-ink focus:outline-none"
+                  >
+                    <option value="all">Risk Band</option>
+                    {RISK_FILTERS.filter((r) => r.id !== 'all').map((r) => (
+                      <option key={r.id} value={r.id}>{r.label}</option>
+                    ))}
+                  </select>
+                </th>
               </tr>
             </thead>
             <tbody>
