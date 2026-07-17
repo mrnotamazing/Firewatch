@@ -321,19 +321,35 @@ function SuggestionsModal({ onClose }: { onClose: () => void }) {
 
 function SuggestionsTrigger() {
   const [open, setOpen] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+
+  if (dismissed) return null;
+
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 border border-ink bg-ink px-4 py-3 text-left shadow-lg hover:bg-ink/90 sm:bottom-6 sm:right-6"
-      >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-ember/40 bg-ember-soft text-ember">
-          <MessageSquarePlus size={16} />
-        </span>
-        <span className="hidden font-display text-[13px] font-bold uppercase leading-snug text-paper sm:block">
-          Suggestions?
-        </span>
-      </button>
+      <div className="fixed bottom-5 right-5 z-40 sm:bottom-6 sm:right-6">
+        <button
+          onClick={() => setOpen(true)}
+          className="flex max-w-[220px] items-center gap-2.5 border border-ink bg-paper py-3 pl-4 pr-6 text-left shadow-lg hover:bg-paper-2 sm:max-w-none"
+        >
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-ember/40 bg-ember-soft text-ember">
+            <MessageSquarePlus size={16} />
+          </span>
+          <span className="font-display text-[13px] font-bold uppercase leading-snug text-ink">
+            Help Bengaluru get more fire-safe
+          </span>
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setDismissed(true);
+          }}
+          aria-label="Dismiss suggestions prompt"
+          className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full border border-ink/25 bg-paper text-ink/50 shadow hover:text-ink"
+        >
+          <X size={11} />
+        </button>
+      </div>
       {open && <SuggestionsModal onClose={() => setOpen(false)} />}
     </>
   );
