@@ -1,0 +1,15 @@
+# FireWatch is a client-side-routed React app (React Router). Apache has no file for
+# routes like /heatmap or /report — without this, refreshing or directly opening any
+# non-homepage URL 404s because Apache looks for a matching file/folder that doesn't
+# exist. This sends every request that isn't a real file or directory to index.html,
+# where React Router takes over and renders the right page.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  RewriteRule ^ index.html [L]
+</IfModule>
