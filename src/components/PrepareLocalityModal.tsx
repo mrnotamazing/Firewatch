@@ -1,6 +1,9 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Search, LoaderCircle, ShieldCheck, Flame, Building2, Printer, Phone } from 'lucide-react';
+import {
+  X, Search, LoaderCircle, ShieldCheck, Flame, Printer, Phone,
+  DoorOpen, BellRing, Zap, ClipboardList, HeartPulse,
+} from 'lucide-react';
 import type { LocalityStats } from '../lib/scoring';
 import { riskBandMeta } from '../lib/scoring';
 import { nearestStation, haversineKm } from '../lib/geo';
@@ -20,37 +23,46 @@ const UNIVERSAL_NUMBERS = [
 ];
 
 const SAFETY_CHECKLIST = [
-  'Know two exit routes from your home or workplace, and agree on a meeting point outside.',
-  'Keep a fire extinguisher or a damp heavy cloth in the kitchen, and know how to use it.',
-  'Never leave a gas cylinder near an open flame, and don’t overload electrical sockets.',
-  'Test smoke alarms monthly; replace the battery at least once a year.',
-  'Keep this sheet somewhere every member of the household knows to find it.',
+  { icon: DoorOpen, text: 'Know two exit routes from your home or workplace, and agree on a meeting point outside.' },
+  { icon: Flame, text: 'Keep a fire extinguisher or a damp heavy cloth in the kitchen, and know how to use it.' },
+  { icon: Zap, text: 'Never leave a gas cylinder near an open flame, and don’t overload electrical sockets.' },
+  { icon: BellRing, text: 'Test smoke alarms monthly; replace the battery at least once a year.' },
+  { icon: ClipboardList, text: 'Keep this sheet somewhere every member of the household knows to find it.' },
 ];
 
-function googleMapsUrl(name: string) {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name}, Bengaluru`)}`;
+/** Turns coordinates into a short, printable street address via reverse geocoding —
+ * a live link is useless on paper, but a real address still is. */
+async function reverseGeocode(lat: number, lng: number): Promise<string> {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+    );
+    const data = await res.json();
+    const a = data?.address ?? {};
+    const parts = [a.road, a.suburb || a.neighbourhood, a.city_district || a.city].filter(Boolean);
+    return parts.length ? parts.join(', ') : (data?.display_name ?? 'Address unavailable — see map for location');
+  } catch {
+    return 'Address unavailable — see map for location';
+  }
 }
 
 interface PrepResult {
   stat: LocalityStats;
-  hospital: { station: FireStation; distanceKm: number };
-  police: { station: FireStation; distanceKm: number };
+  hospital: { station: FireStation; distanceKm: number; address: string };
+  police: { station: FireStation; distanceKm: number; address: string };
+  fireAddress: string;
   matchedNote: string | null;
 }
 
-function FacilityRow({ label, icon, name, distanceKm }: { label: string; icon: React.ReactNode; name: string; distanceKm: number }) {
+function FacilityRow({ label, icon, name, distanceKm, address }: { label: string; icon: ReactNode; name: string; distanceKm: number; address: string }) {
   return (
     <div className="flex items-start gap-2.5 border-b border-ink/10 py-3 last:border-b-0">
-      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center border border-ink/15 text-ink/60">{icon}</span>
+      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center border border-ink/15 text-ink/60">{icon}</span>
       <div className="min-w-0 flex-1">
         <div className="font-mono text-[9.5px] font-semibold uppercase tracking-wide text-ink/45">{label}</div>
         <div className="text-[13px] font-semibold text-ink">{name}</div>
-        <div className="mt-0.5 flex items-center gap-2 font-mono text-[10.5px] text-ink/50">
-          <span>{distanceKm.toFixed(1)} km away</span>
-          <a href={googleMapsUrl(name)} target="_blank" rel="noreferrer" className="text-ember hover:text-ember-2 print:hidden">
-            Get Directions →
-          </a>
-        </div>
+        <div className="mt-0.5 text-[11px] leading-snug text-ink/55">{address}</div>
+        <div className="mt-0.5 font-mono text-[10.5px] text-ink/45">{distanceKm.toFixed(1)} km away</div>
       </div>
     </div>
   );
@@ -61,7 +73,8 @@ function PrepSheet({ result }: { result: PrepResult }) {
   const color = riskBandMeta[stat.band].color;
   return (
     <div>
-      <div className="flex items-center gap-3 border-b border-ink/15 pb-4">
+      <div className="flex items-center gap-3 border-b-2 border-ink pb-4">
+        <ShieldCheck size={30} className="shrink-0 text-ember" />
         <div
           className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full font-mono text-[20px] font-bold"
           style={{ background: `${color}18`, border: `3px solid ${color}`, color }}
@@ -82,9 +95,9 @@ function PrepSheet({ result }: { result: PrepResult }) {
 
       <div className="mt-4">
         <div className="mb-1 font-mono text-[10.5px] font-semibold uppercase tracking-wide text-ink/45">Nearest Help</div>
-        <FacilityRow label="Fire Station" icon={<Flame size={14} />} name={stat.nearestStation.name} distanceKm={stat.distanceKm} />
-        <FacilityRow label="Hospital" icon={<Building2 size={14} />} name={hospital.station.name} distanceKm={hospital.distanceKm} />
-        <FacilityRow label="Police Station" icon={<ShieldCheck size={14} />} name={police.station.name} distanceKm={police.distanceKm} />
+        <FacilityRow label="Fire Station" icon={<Flame size={15} />} name={stat.nearestStation.name} distanceKm={stat.distanceKm} address={result.fireAddress} />
+        <FacilityRow label="Hospital" icon={<HeartPulse size={15} />} name={hospital.station.name} distanceKm={hospital.distanceKm} address={hospital.address} />
+        <FacilityRow label="Police Station" icon={<ShieldCheck size={15} />} name={police.station.name} distanceKm={police.distanceKm} address={police.address} />
       </div>
 
       <div className="mt-5">
@@ -103,11 +116,13 @@ function PrepSheet({ result }: { result: PrepResult }) {
 
       <div className="mt-5">
         <div className="mb-1.5 font-mono text-[10.5px] font-semibold uppercase tracking-wide text-ink/45">Fire Safety Checklist</div>
-        <ul className="space-y-1.5">
-          {SAFETY_CHECKLIST.map((item) => (
-            <li key={item} className="flex gap-2 text-[12px] leading-relaxed text-ink/70">
-              <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-ember" />
-              {item}
+        <ul className="space-y-2">
+          {SAFETY_CHECKLIST.map(({ icon: Icon, text }) => (
+            <li key={text} className="flex items-start gap-2.5 text-[12px] leading-relaxed text-ink/70">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center border border-ink/15 text-ember-2">
+                <Icon size={13} />
+              </span>
+              <span className="pt-0.5">{text}</span>
             </li>
           ))}
         </ul>
@@ -166,9 +181,22 @@ export default function PrepareLocalityModal({ allStats, onClose }: { allStats: 
         matchedNote = `"${q}" isn't directly covered — showing the closest scored locality: ${best.locality.name} (${bestKm.toFixed(1)} km away).`;
       }
 
-      const hospital = nearestStation(matched.locality, hospitals);
-      const police = nearestStation(matched.locality, policeStations);
-      setResult({ stat: matched, hospital, police, matchedNote });
+      const hospitalNearest = nearestStation(matched.locality, hospitals);
+      const policeNearest = nearestStation(matched.locality, policeStations);
+
+      const [fireAddress, hospitalAddress, policeAddress] = await Promise.all([
+        reverseGeocode(matched.nearestStation.lat, matched.nearestStation.lng),
+        reverseGeocode(hospitalNearest.station.lat, hospitalNearest.station.lng),
+        reverseGeocode(policeNearest.station.lat, policeNearest.station.lng),
+      ]);
+
+      setResult({
+        stat: matched,
+        hospital: { ...hospitalNearest, address: hospitalAddress },
+        police: { ...policeNearest, address: policeAddress },
+        fireAddress,
+        matchedNote,
+      });
     } catch {
       setError('Could not look up that area right now. Check your connection and try again.');
     } finally {
@@ -218,6 +246,9 @@ export default function PrepareLocalityModal({ allStats, onClose }: { allStats: 
                   {searching ? <LoaderCircle size={14} className="animate-spin" /> : 'Generate'}
                 </button>
               </form>
+              {searching && (
+                <p className="mt-3 font-mono text-[11px] text-ink/45 print:hidden">Looking up nearest help and addresses…</p>
+              )}
               {error && <p className="mt-3 border border-high-risk/30 bg-high-risk-soft px-3 py-2 text-[12px] text-high-risk print:hidden">{error}</p>}
             </>
           ) : (

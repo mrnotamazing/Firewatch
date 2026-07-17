@@ -44,15 +44,14 @@ export default function HeatmapPage() {
   const [densityFilter, setDensityFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mapMode, setMapMode] = useState<MapMode>('markers');
-  // Both side panels default open on tablet/desktop, but start closed on phones so the map itself
-  // — the main feature — is immediately visible instead of being squeezed into a sliver.
-  const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 640;
-  const [panelOpen, setPanelOpen] = useState(isDesktop);
-  const [controlsOpen, setControlsOpen] = useState(isDesktop);
+  // Both side panels start closed on every device — the map itself is the main feature and should
+  // be seen in full first; controls and the watchlist are one deliberate click away.
+  const [panelOpen, setPanelOpen] = useState(false);
+  const [controlsOpen, setControlsOpen] = useState(false);
   const [searchNote, setSearchNote] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
   const [prepareOpen, setPrepareOpen] = useState(false);
-  const [sortKey, setSortKey] = useState<'score' | 'name' | 'density'>('score');
+  const [sortKey, setSortKey] = useState<'score' | 'name'>('score');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
   function toggleSort(key: typeof sortKey) {
@@ -92,10 +91,7 @@ export default function HeatmapPage() {
   const tableStats = useMemo(() => {
     const arr = [...filteredStats];
     arr.sort((a, b) => {
-      let cmp = 0;
-      if (sortKey === 'score') cmp = a.safetyScore - b.safetyScore;
-      else if (sortKey === 'name') cmp = a.locality.name.localeCompare(b.locality.name);
-      else cmp = a.locality.populationDensityPerSqKm - b.locality.populationDensityPerSqKm;
+      const cmp = sortKey === 'score' ? a.safetyScore - b.safetyScore : a.locality.name.localeCompare(b.locality.name);
       return sortDir === 'asc' ? cmp : -cmp;
     });
     return arr;
@@ -165,21 +161,35 @@ export default function HeatmapPage() {
             Fire Safety Heatmap
           </h1>
         </div>
-        <div className="flex max-w-sm flex-col items-start gap-2.5 sm:items-end">
-          <p className="text-[13px] leading-relaxed text-ink/55">
-            Real-time fire risk for every Bengaluru locality — powered by fire station proximity, reported hazards,
-            population density, and area type.
-          </p>
-          <button
-            onClick={() => setPrepareOpen(true)}
-            className="flex items-center gap-1.5 bg-ink px-4 py-2 font-display text-[12.5px] font-semibold uppercase tracking-wide text-paper hover:bg-ink-2"
-          >
-            <FileHeart size={14} /> Prepare Your Locality
-          </button>
-        </div>
+        <p className="max-w-sm text-[13px] leading-relaxed text-ink/55">
+          Real-time fire risk for every Bengaluru locality — powered by fire station proximity, reported hazards,
+          population density, and area type.
+        </p>
       </div>
 
       {prepareOpen && <PrepareLocalityModal allStats={allStats} onClose={() => setPrepareOpen(false)} />}
+
+      <div className="border-b border-ink bg-ink">
+        <div className="mx-auto flex max-w-[1400px] flex-col items-center justify-between gap-4 px-6 py-5 sm:flex-row">
+          <div className="flex items-center gap-3 text-center sm:text-left">
+            <span className="hidden h-11 w-11 shrink-0 items-center justify-center border border-ember/40 bg-ember/10 text-ember sm:flex">
+              <FileHeart size={20} />
+            </span>
+            <div>
+              <div className="font-mono text-[10.5px] font-semibold uppercase tracking-wide text-ember">Be Ready, Not Sorry</div>
+              <h2 className="font-display text-[18px] font-bold uppercase leading-snug text-paper sm:text-[20px]">
+                Prepare Your Locality — get a printable emergency sheet
+              </h2>
+            </div>
+          </div>
+          <button
+            onClick={() => setPrepareOpen(true)}
+            className="flex shrink-0 items-center gap-2 bg-ember px-5 py-3 font-display text-[13px] font-bold uppercase tracking-wide text-paper shadow-lg hover:bg-ember-2"
+          >
+            <FileHeart size={15} /> Prepare Now
+          </button>
+        </div>
+      </div>
 
       <div className="border-b border-ink bg-paper-2 px-4 py-6 sm:px-10 sm:py-10 lg:px-16">
       <div className="relative mx-auto h-[70vh] min-h-[480px] w-full max-w-[1400px] border border-ink shadow-md">
@@ -280,10 +290,10 @@ export default function HeatmapPage() {
           <button
             onClick={() => setControlsOpen(true)}
             title="Show map controls"
-            className="absolute left-14 top-3 z-[20] flex items-center gap-1.5 border border-line bg-paper/95 px-3 py-2 font-mono text-[11px] font-semibold uppercase tracking-wide text-ink shadow-md backdrop-blur-sm hover:border-ink"
+            className="absolute left-14 top-3 z-[20] flex items-center gap-1.5 border border-ember bg-ember px-3.5 py-2.5 font-display text-[11.5px] font-semibold uppercase tracking-wide text-paper shadow-lg hover:bg-ember-2"
             style={{ transform: 'translateZ(0)' }}
           >
-            <SlidersHorizontal size={13} /> Controls
+            <SlidersHorizontal size={14} /> Filters &amp; Controls
           </button>
         )}
 
@@ -326,7 +336,7 @@ export default function HeatmapPage() {
               </button>
             )}
             {selected ? (
-              <LocalityDetailPanel stat={selected} onClose={() => { setSelectedId(null); setPanelOpen(isDesktop); }} />
+              <LocalityDetailPanel stat={selected} onClose={() => { setSelectedId(null); setPanelOpen(false); }} />
             ) : (
               <div className="flex h-full flex-col">
                 <div className="border-b border-ink/15 px-5 py-4">
@@ -360,11 +370,11 @@ export default function HeatmapPage() {
         ) : (
           <button
             onClick={() => setPanelOpen(true)}
-            title="Open panel"
-            className="absolute right-3 top-1/2 z-[30] flex h-9 w-9 -translate-y-1/2 items-center justify-center border border-ink bg-ink text-paper shadow-lg hover:bg-ink-2"
-            style={{ transform: 'translateY(-50%) translateZ(0)' }}
+            title="Open watchlist"
+            className="absolute right-3 top-3 z-[30] flex items-center gap-1.5 border border-ink bg-ink px-3.5 py-2.5 font-display text-[11.5px] font-semibold uppercase tracking-wide text-paper shadow-lg hover:bg-ink-2"
+            style={{ transform: 'translateZ(0)' }}
           >
-            <PanelRightOpen size={16} />
+            <PanelRightOpen size={14} /> Watchlist
           </button>
         )}
       </div>
@@ -387,9 +397,6 @@ export default function HeatmapPage() {
                   Locality {sortKey === 'name' && (sortDir === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="px-4 py-2.5 font-medium">Type</th>
-                <th className="cursor-pointer select-none px-4 py-2.5 font-medium hover:text-ink" onClick={() => toggleSort('density')}>
-                  Density {sortKey === 'density' && (sortDir === 'asc' ? '↑' : '↓')}
-                </th>
                 <th className="px-4 py-2.5 font-medium">Active</th>
                 <th className="px-4 py-2.5 font-medium">Pending</th>
                 <th className="px-4 py-2.5 font-medium">Risk Band</th>
@@ -409,7 +416,6 @@ export default function HeatmapPage() {
                   </td>
                   <td className="px-4 py-2.5 font-medium text-ink">{s.locality.name}</td>
                   <td className="px-4 py-2.5 capitalize text-ink/60">{s.locality.type}</td>
-                  <td className="px-4 py-2.5 font-mono text-ink/70">{s.locality.populationDensityPerSqKm.toLocaleString('en-IN')}/km²</td>
                   <td className="px-4 py-2.5 font-mono text-ink/70">{s.activeHazards}</td>
                   <td className="px-4 py-2.5 font-mono text-ink/70">{s.pendingHazards}</td>
                   <td className="px-4 py-2.5"><RiskBadge band={s.band} /></td>
