@@ -248,8 +248,8 @@ function SuggestionsModal({ onClose }: { onClose: () => void }) {
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/60 p-4 py-10" onClick={onClose}>
-      <div className="w-full max-w-md border border-ink bg-paper shadow-2xl" onClick={(e) => e.stopPropagation()}>
+    <div className="animate-fade-in fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/60 p-4 py-10" onClick={onClose}>
+      <div className="animate-modal-in w-full max-w-md border border-ink bg-paper shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between border-b border-ink/15 px-5 py-4">
           <div>
             <div className="font-mono text-[10px] font-medium uppercase tracking-wide text-ink/45">Your Voice</div>

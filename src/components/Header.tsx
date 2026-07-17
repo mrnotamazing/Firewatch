@@ -64,7 +64,7 @@ export default function Header() {
       </div>
 
       {menuOpen && (
-        <nav className="border-t border-ink/10 bg-paper md:hidden">
+        <nav className="animate-fade-in-down border-t border-ink/10 bg-paper md:hidden">
           <NavLink
             to="/report"
             onClick={() => setMenuOpen(false)}

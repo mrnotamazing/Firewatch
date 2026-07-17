@@ -205,9 +205,9 @@ export default function PrepareLocalityModal({ allStats, onClose }: { allStats: 
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/60 p-4 py-10 print:relative print:inset-auto print:block print:bg-paper print:p-0" onClick={onClose}>
+    <div className="animate-fade-in fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-ink/60 p-4 py-10 print:relative print:inset-auto print:block print:bg-paper print:p-0" onClick={onClose}>
       <div
-        className="w-full max-w-lg border border-ink bg-paper shadow-2xl print:w-full print:max-w-none print:border-0 print:shadow-none"
+        className="animate-modal-in w-full max-w-lg border border-ink bg-paper shadow-2xl print:w-full print:max-w-none print:border-0 print:shadow-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-ink/15 px-5 py-4 print:hidden">

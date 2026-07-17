@@ -196,7 +196,7 @@ export default function HeatmapPage() {
         <HeatmapMap stats={filteredStats} selectedId={selectedId} onSelect={handleSelect} mode={mapMode} />
 
         {controlsOpen ? (
-          <div className="absolute left-14 top-3 z-[20] w-[260px] space-y-1.5 sm:w-[300px]" style={{ transform: 'translateZ(0)' }}>
+          <div className="animate-pop-in absolute left-14 top-3 z-[20] w-[260px] space-y-1.5 sm:w-[300px]" style={{ transform: 'translateZ(0)' }}>
             <div className="flex items-center justify-between border border-line bg-paper/95 px-3 py-1.5 shadow-md backdrop-blur-sm">
               <span className="font-mono text-[10px] font-semibold uppercase tracking-wide text-ink/45">Map Controls</span>
               <button onClick={() => setControlsOpen(false)} title="Hide controls" className="text-ink/40 hover:text-ember">
@@ -323,7 +323,7 @@ export default function HeatmapPage() {
 
         {panelOpen ? (
           <div
-            className="absolute right-0 top-0 z-[30] h-full w-full border-l border-ink bg-paper shadow-2xl sm:max-w-[340px]"
+            className="animate-slide-in-right absolute right-0 top-0 z-[30] h-full w-full border-l border-ink bg-paper shadow-2xl sm:max-w-[340px]"
             style={{ transform: 'translateZ(0)' }}
           >
             {!selected && (

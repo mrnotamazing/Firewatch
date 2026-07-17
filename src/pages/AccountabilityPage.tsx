@@ -254,7 +254,7 @@ export default function AccountabilityPage() {
             </thead>
             <tbody>
               {departmentStats.map((d) => (
-                <tr key={d.dept} className="border-b border-ink/10 text-[13px] last:border-b-0">
+                <tr key={d.dept} className="border-b border-ink/10 text-[13px] transition-colors last:border-b-0 hover:bg-paper-2">
                   <td className="px-4 py-2.5 font-semibold text-ink">{d.dept}</td>
                   <td className="px-4 py-2.5 font-mono text-ink/70">{d.routed}</td>
                   <td className="px-4 py-2.5 font-mono text-safe">{d.resolved}</td>
