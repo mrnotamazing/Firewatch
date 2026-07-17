@@ -80,18 +80,23 @@ body {
   outline-offset: 2px;
 }
 
-/* Baseline smoothing for every interactive element — hover/focus state changes shouldn't
-   snap instantly. Tailwind utility classes (transition-*, duration-*) always win on
-   specificity, so this only fills the gaps where nobody bothered to add one. */
-a,
-button,
-[role='button'],
-input,
-select,
-textarea {
-  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
-  transition-duration: 320ms;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+/* Baseline smoothing for every interactive element, so hover/focus state changes do not
+   snap instantly. This has to live inside @layer base: CSS cascade layers always rank
+   unlayered rules above layered ones regardless of specificity, so an unlayered version of
+   this rule would silently out-rank every Tailwind transition/duration utility (which
+   Tailwind puts in its own layer) on any button/a/input — which is exactly what broke the
+   suggestions button width transition before this was wrapped. */
+@layer base {
+  a,
+  button,
+  [role='button'],
+  input,
+  select,
+  textarea {
+    transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+    transition-duration: 320ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 @keyframes fade-in {
