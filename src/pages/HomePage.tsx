@@ -103,7 +103,7 @@ export default function HomePage() {
 
           <Link to="/heatmap" className="group relative block h-[420px] overflow-hidden border border-ink shadow-sm">
             <div className="pointer-events-none absolute inset-0 z-[25]">
-              <HeatmapMap stats={allStats} selectedId={previewSelected} onSelect={setPreviewSelected} mode="markers" zoom={11} />
+              <HeatmapMap stats={allStats} selectedId={previewSelected} onSelect={setPreviewSelected} mode="markers" zoom={12} />
             </div>
             <div className="absolute inset-0 z-[26] flex items-center justify-center bg-ink/0 transition-colors group-hover:bg-ink/10">
               <span className="translate-y-2 bg-ink px-5 py-2.5 font-display text-[13px] font-semibold uppercase tracking-wide text-paper opacity-0 shadow-lg transition-all group-hover:translate-y-0 group-hover:opacity-100">
