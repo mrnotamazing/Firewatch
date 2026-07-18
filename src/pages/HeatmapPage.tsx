@@ -391,40 +391,28 @@ export default function HeatmapPage() {
           <span className="font-mono text-[11px] text-ink/45">{filteredStats.length} records</span>
         </div>
 
-        <div className="overflow-x-auto border border-ink">
+        <div className="max-h-[640px] overflow-auto border border-ink">
           <table className="w-full min-w-[720px] border-collapse text-left">
-            <thead>
-              <tr className="border-b-2 border-ink bg-ember font-display text-[13px] uppercase tracking-wide text-paper sm:text-[14px]">
+            <thead className="sticky top-0 z-10">
+              <tr className="border-b border-ink/10 bg-white/70 font-display text-[13px] uppercase tracking-wide text-ink shadow-[0_1px_12px_rgba(15,15,15,0.08)] backdrop-blur-xl sm:text-[14px]">
                 <th
-                  className="cursor-pointer select-none px-4 py-4 font-bold transition-colors hover:text-ink"
+                  className="cursor-pointer select-none px-4 py-4 font-bold transition-colors"
                   onClick={() => toggleSort('score')}
                 >
-                  {sortKey === 'score' ? (
-                    <span className="inline-flex items-center gap-1.5 bg-paper px-2.5 py-1 text-ember">
-                      Score <ArrowUpDown size={13} />
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5">
-                      Score <ArrowUpDown size={13} className="text-paper/60" />
-                    </span>
-                  )}
+                  <span className={`inline-flex items-center gap-1.5 border-b-2 pb-0.5 transition-colors ${sortKey === 'score' ? 'border-ember text-ember' : 'border-transparent text-ink/55 hover:text-ink'}`}>
+                    Score <ArrowUpDown size={13} className={sortKey === 'score' ? 'text-ember' : 'text-ink/25'} />
+                  </span>
                 </th>
                 <th
-                  className="cursor-pointer select-none px-4 py-4 font-bold transition-colors hover:text-ink"
+                  className="cursor-pointer select-none px-4 py-4 font-bold transition-colors"
                   onClick={() => toggleSort('name')}
                 >
-                  {sortKey === 'name' ? (
-                    <span className="inline-flex items-center gap-1.5 bg-paper px-2.5 py-1 text-ember">
-                      Locality <ArrowUpDown size={13} />
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5">
-                      Locality <ArrowUpDown size={13} className="text-paper/60" />
-                    </span>
-                  )}
+                  <span className={`inline-flex items-center gap-1.5 border-b-2 pb-0.5 transition-colors ${sortKey === 'name' ? 'border-ember text-ember' : 'border-transparent text-ink/55 hover:text-ink'}`}>
+                    Locality <ArrowUpDown size={13} className={sortKey === 'name' ? 'text-ember' : 'text-ink/25'} />
+                  </span>
                 </th>
                 <th className="px-2 py-2.5">
-                  <div className={`flex items-center gap-1.5 border-2 px-2 py-1.5 transition-colors ${typeFilter !== 'All Types' ? 'border-paper bg-paper text-ember' : 'border-paper/40 text-paper'}`}>
+                  <div className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 backdrop-blur-md transition-colors ${typeFilter !== 'All Types' ? 'border-ember/30 bg-ember-soft text-ember' : 'border-ink/10 bg-white/50 text-ink/55'}`}>
                     <Filter size={12} className="shrink-0" />
                     <select
                       value={typeFilter}
@@ -438,10 +426,10 @@ export default function HeatmapPage() {
                     </select>
                   </div>
                 </th>
-                <th className="px-4 py-4 font-bold">Active</th>
-                <th className="px-4 py-4 font-bold">Pending</th>
+                <th className="px-4 py-4 font-bold text-ink/55">Active</th>
+                <th className="px-4 py-4 font-bold text-ink/55">Pending</th>
                 <th className="px-2 py-2.5">
-                  <div className={`flex items-center gap-1.5 border-2 px-2 py-1.5 transition-colors ${riskFilter !== 'all' ? 'border-paper bg-paper text-ember' : 'border-paper/40 text-paper'}`}>
+                  <div className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 backdrop-blur-md transition-colors ${riskFilter !== 'all' ? 'border-ember/30 bg-ember-soft text-ember' : 'border-ink/10 bg-white/50 text-ink/55'}`}>
                     <Filter size={12} className="shrink-0" />
                     <select
                       value={riskFilter}
