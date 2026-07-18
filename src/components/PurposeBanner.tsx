@@ -13,7 +13,7 @@ export default function PurposeBanner() {
         <Info size={14} className="mt-0.5 shrink-0 text-ember-2" />
         <p className="font-mono text-[11.5px] font-medium leading-relaxed text-ember-2">
           FireWatch is a community awareness &amp; participation tool, not a legal or enforcement authority — built
-          to help residents flag hazards and hold departments publicly accountable, in the interest of community
+          to help residents flag hazards and bring transparency to how they're handled, in the interest of community
           betterment.
         </p>
       </div>

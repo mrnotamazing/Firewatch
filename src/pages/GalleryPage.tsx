@@ -154,7 +154,7 @@ export default function GalleryPage() {
             Report a Hazard
           </Link>
           <Link to="/accountability" className="flex items-center gap-2 font-mono text-[12.5px] font-medium uppercase tracking-wide text-ink hover:text-ember">
-            Department Accountability
+            Department Transparency
           </Link>
         </div>
       </section>

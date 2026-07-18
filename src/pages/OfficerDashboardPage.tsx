@@ -350,7 +350,7 @@ function ReportDetail({
 
         {report.status !== 'resolved' && (
           <div className={`border px-3 py-2 font-mono text-[11.5px] font-medium uppercase tracking-wide ${hoursUntil(report.dueAt) < 0 ? 'border-high-risk/30 bg-high-risk-soft text-high-risk' : 'border-ink/15 bg-paper-2 text-ink/60'}`}>
-            {hoursUntil(report.dueAt) < 0 ? `Overdue by ${Math.abs(hoursUntil(report.dueAt))}h` : `Due in ${hoursUntil(report.dueAt)}h (48h SLA)`}
+            {hoursUntil(report.dueAt) < 0 ? `Overdue by ${Math.abs(hoursUntil(report.dueAt))}h` : `Due in ${hoursUntil(report.dueAt)}h (48h target)`}
           </div>
         )}
 

@@ -7,7 +7,7 @@ import LogoMark from './LogoMark';
 // and duplicating it as a nav link was making the bar feel crowded.
 const navItems = [
   { to: '/heatmap', label: 'Heatmap' },
-  { to: '/accountability', label: 'Accountability' },
+  { to: '/accountability', label: 'Transparency' },
   { to: '/gallery', label: 'Gallery' },
   { to: '/quiz', label: "While You're At It" },
 ];

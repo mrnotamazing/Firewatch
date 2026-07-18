@@ -157,18 +157,20 @@ export default function HeatmapMap({
   selectedId,
   onSelect,
   mode = 'markers',
+  zoom = 11,
 }: {
   stats: LocalityStats[];
   selectedId: string | null;
   onSelect: (id: string) => void;
   mode?: MapMode;
+  zoom?: number;
 }) {
   const selected = useMemo(() => stats.find((s) => s.locality.id === selectedId) ?? null, [stats, selectedId]);
 
   return (
     <MapContainer
       center={BLR_CENTER}
-      zoom={11}
+      zoom={zoom}
       scrollWheelZoom
       className="isolate h-full w-full"
       style={{ background: 'var(--color-paper-2)', zIndex: 0 }}

@@ -51,7 +51,7 @@ export default function ReportHazardPage() {
 
   const recent = useMemo(() => [...reports].sort((a, b) => b.createdAt - a.createdAt).slice(0, 4), [reports]);
 
-  const canContinueFromDetails = description.trim().length > 0;
+  const canContinueFromDetails = description.trim().length > 0 && address.trim().length > 0 && !!photoDataUrl;
   const canSubmit = reporterName.trim().length > 0;
 
   function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
@@ -224,7 +224,9 @@ export default function ReportHazardPage() {
             {step === 1 && (
               <div className="space-y-5">
                 <div>
-                  <label className="mb-1.5 block font-mono text-[11.5px] font-semibold uppercase tracking-wide text-ink/60">Photo</label>
+                  <label className="mb-1.5 block font-mono text-[11.5px] font-semibold uppercase tracking-wide text-ink/60">
+                    Photo <span className="text-ember">*</span>
+                  </label>
                   {photoDataUrl ? (
                     <div className="relative inline-block">
                       <img src={photoDataUrl} alt="Hazard preview" className="h-40 w-56 border border-ink/20 object-cover" />
@@ -280,7 +282,9 @@ export default function ReportHazardPage() {
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block font-mono text-[11.5px] font-semibold uppercase tracking-wide text-ink/60">Landmark / street (optional)</label>
+                  <label className="mb-1.5 block font-mono text-[11.5px] font-semibold uppercase tracking-wide text-ink/60">
+                    Address / Landmark <span className="text-ember">*</span>
+                  </label>
                   <input
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}

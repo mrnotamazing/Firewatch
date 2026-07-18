@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Search, Camera, Database, MapPin, LayoutGrid, Waves, ShieldCheck, Images, PanelRightClose, PanelRightOpen, SlidersHorizontal, X, FileHeart } from 'lucide-react';
+import { Search, Camera, Database, MapPin, LayoutGrid, Waves, ShieldCheck, Images, PanelRightClose, PanelRightOpen, SlidersHorizontal, X, FileHeart, ArrowUpDown, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import HeatmapMap, { type MapMode } from '../components/HeatmapMap';
 import LocalityDetailPanel from '../components/LocalityDetailPanel';
@@ -389,39 +389,55 @@ export default function HeatmapPage() {
         <div className="overflow-x-auto border border-ink">
           <table className="w-full min-w-[720px] border-collapse text-left">
             <thead>
-              <tr className="border-b border-ink bg-paper-2 font-mono text-[10.5px] uppercase tracking-wide text-ink/55">
-                <th className="cursor-pointer select-none px-4 py-2.5 font-medium hover:text-ink" onClick={() => toggleSort('score')}>
-                  Score {sortKey === 'score' && (sortDir === 'asc' ? '↑' : '↓')}
+              <tr className="border-b-2 border-ink bg-ink font-mono text-[11px] uppercase tracking-wide text-paper/70">
+                <th
+                  className={`cursor-pointer select-none px-4 py-3 font-semibold transition-colors hover:text-paper ${sortKey === 'score' ? 'text-ember' : ''}`}
+                  onClick={() => toggleSort('score')}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    Score <ArrowUpDown size={11} className={sortKey === 'score' ? 'text-ember' : 'text-paper/40'} />
+                  </span>
                 </th>
-                <th className="cursor-pointer select-none px-4 py-2.5 font-medium hover:text-ink" onClick={() => toggleSort('name')}>
-                  Locality {sortKey === 'name' && (sortDir === 'asc' ? '↑' : '↓')}
+                <th
+                  className={`cursor-pointer select-none px-4 py-3 font-semibold transition-colors hover:text-paper ${sortKey === 'name' ? 'text-ember' : ''}`}
+                  onClick={() => toggleSort('name')}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    Locality <ArrowUpDown size={11} className={sortKey === 'name' ? 'text-ember' : 'text-paper/40'} />
+                  </span>
                 </th>
-                <th className="px-2 py-1.5 font-medium">
-                  <select
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
-                    onClick={(e) => e.stopPropagation()}
-                    className="w-full cursor-pointer bg-transparent px-1.5 py-1 font-mono text-[10.5px] uppercase tracking-wide text-ink/55 hover:text-ink focus:outline-none"
-                  >
-                    {TYPE_FILTERS.map((t) => (
-                      <option key={t} value={t}>{t === 'All Types' ? 'Type' : `${t[0].toUpperCase()}${t.slice(1)}`}</option>
-                    ))}
-                  </select>
+                <th className="px-2 py-2">
+                  <div className={`flex items-center gap-1 border px-1.5 py-1 transition-colors ${typeFilter !== 'All Types' ? 'border-ember text-ember' : 'border-paper/20 text-paper/70'}`}>
+                    <Filter size={10} className="shrink-0" />
+                    <select
+                      value={typeFilter}
+                      onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-full cursor-pointer bg-transparent font-mono text-[10.5px] uppercase tracking-wide focus:outline-none"
+                    >
+                      {TYPE_FILTERS.map((t) => (
+                        <option key={t} value={t} className="text-ink">{t === 'All Types' ? 'Type' : `${t[0].toUpperCase()}${t.slice(1)}`}</option>
+                      ))}
+                    </select>
+                  </div>
                 </th>
-                <th className="px-4 py-2.5 font-medium">Active</th>
-                <th className="px-4 py-2.5 font-medium">Pending</th>
-                <th className="px-2 py-1.5 font-medium">
-                  <select
-                    value={riskFilter}
-                    onChange={(e) => setRiskFilter(e.target.value as RiskBand | 'all')}
-                    onClick={(e) => e.stopPropagation()}
-                    className="w-full cursor-pointer bg-transparent px-1.5 py-1 font-mono text-[10.5px] uppercase tracking-wide text-ink/55 hover:text-ink focus:outline-none"
-                  >
-                    <option value="all">Risk Band</option>
-                    {RISK_FILTERS.filter((r) => r.id !== 'all').map((r) => (
-                      <option key={r.id} value={r.id}>{r.label}</option>
-                    ))}
-                  </select>
+                <th className="px-4 py-3 font-semibold">Active</th>
+                <th className="px-4 py-3 font-semibold">Pending</th>
+                <th className="px-2 py-2">
+                  <div className={`flex items-center gap-1 border px-1.5 py-1 transition-colors ${riskFilter !== 'all' ? 'border-ember text-ember' : 'border-paper/20 text-paper/70'}`}>
+                    <Filter size={10} className="shrink-0" />
+                    <select
+                      value={riskFilter}
+                      onChange={(e) => setRiskFilter(e.target.value as RiskBand | 'all')}
+                      onClick={(e) => e.stopPropagation()}
+                      className="w-full cursor-pointer bg-transparent font-mono text-[10.5px] uppercase tracking-wide focus:outline-none"
+                    >
+                      <option value="all" className="text-ink">Risk Band</option>
+                      {RISK_FILTERS.filter((r) => r.id !== 'all').map((r) => (
+                        <option key={r.id} value={r.id} className="text-ink">{r.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </th>
               </tr>
             </thead>
@@ -455,7 +471,7 @@ export default function HeatmapPage() {
             <Camera size={14} /> Report a Hazard
           </Link>
           <Link to="/accountability" className="flex items-center gap-2 font-mono text-[12.5px] font-medium uppercase tracking-wide text-ink hover:text-ember">
-            <ShieldCheck size={14} /> Department Accountability
+            <ShieldCheck size={14} /> Department Transparency
           </Link>
           <Link to="/gallery" className="flex items-center gap-2 font-mono text-[12.5px] font-medium uppercase tracking-wide text-ink hover:text-ember">
             <Images size={14} /> Before &amp; After Gallery

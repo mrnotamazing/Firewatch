@@ -105,16 +105,16 @@ const ESCALATION_STEPS = [
     body: 'A hazard is submitted through the Report Hazard flow with photo, location, and description.',
   },
   {
-    title: 'Officer verifies',
+    title: 'Officer reviews',
     body: 'An on-duty officer reviews the report during their shift and assigns, escalates, or begins work.',
   },
   {
     title: 'Ticket sent',
-    body: 'Once verified, the officer sends an automated ticket email to the routing department (BESCOM, BBMP, or Fire Dept).',
+    body: 'Once reviewed, the officer sends an automated ticket email to the routing department (BESCOM, BBMP, or Fire Dept).',
   },
   {
     title: 'Resolution tracked',
-    body: 'Every report carries a 48-hour SLA clock. Reports still open past that window are marked overdue here, publicly.',
+    body: 'Every report carries a 48-hour target. Reports still open past that window are marked overdue here, in the open.',
   },
 ];
 
@@ -165,11 +165,11 @@ export default function AccountabilityPage() {
           </Link>
           <span className="ml-3 font-mono text-[10.5px] uppercase tracking-wide text-ink/45">Public Record</span>
           <h1 className="mt-1 font-display text-[38px] font-bold uppercase leading-none text-ink sm:text-[42px]">
-            Department Accountability
+            Department Transparency
           </h1>
           <p className="mt-1.5 max-w-2xl text-[13.5px] leading-relaxed text-ink/55">
             Every hazard report on FireWatch is routed to a specific authority — BESCOM, BBMP, or the Fire Department
-            — with a public 48-hour clock. This page tracks how each one is actually performing, in the open.
+            — with a public 48-hour target. This page tracks reported progress on each one, in the open.
           </p>
         </div>
       </div>
@@ -282,7 +282,7 @@ export default function AccountabilityPage() {
         </div>
 
         <div className="mb-10">
-          <h2 className="mb-3 font-display text-[22px] font-bold uppercase leading-none text-ink">How A Report Becomes Accountability</h2>
+          <h2 className="mb-3 font-display text-[22px] font-bold uppercase leading-none text-ink">How A Report Becomes A Public Record</h2>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {ESCALATION_STEPS.map((step, i) => (
               <div key={step.title} className="border border-ink p-4">
@@ -304,7 +304,8 @@ export default function AccountabilityPage() {
             <Clock size={13} /> Methodology &amp; limitations
           </div>
           <ul className="space-y-1.5 text-[12.5px] leading-relaxed text-ink/60">
-            <li>· The 48-hour SLA is a target this project sets, not a legal deadline mandated by any department.</li>
+            <li>· All hazard reports are community-submitted. FireWatch does not independently investigate or confirm a hazard before it appears here.</li>
+            <li>· The 48-hour target is a benchmark this project sets for itself, not a legal deadline mandated by any department.</li>
             <li>· Ticket emails currently simulate sending during development — see the Officer Dashboard for status. Department contact addresses are placeholders pending verified official channels.</li>
             <li>· "Resolved" reflects officer-marked status, not independent field verification.</li>
             <li>· All figures update live as reports come in — this is not a static snapshot.</li>

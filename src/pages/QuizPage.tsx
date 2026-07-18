@@ -9,17 +9,17 @@ import { submitSuggestion, submitPollAnswer, fetchPollResults, type PollResults 
 
 const FUN_FACTS = [
   'A residential fire can turn from a small flame to a fully engulfed room in under 3 minutes.',
-  'Cooking is the leading cause of home fires worldwide — and most start when the cook briefly leaves the kitchen.',
+  'Cooking is one of the leading causes of home fires worldwide — many start when the cook briefly leaves the kitchen.',
   'Modern synthetic furniture burns faster and produces more toxic smoke than furniture made decades ago.',
   'The "stop, drop, and roll" technique was popularized in the 1970s and is still the correct response if your clothing catches fire.',
   'Smoke alarms cut the risk of dying in a reported home fire by roughly half.',
   'A fire needs three things to burn — heat, fuel, and oxygen — remove any one, and it goes out. This is called the "fire triangle."',
   'Most fire deaths are caused by smoke inhalation, not burns.',
   'Firefighting foam works by smothering a fire, cutting off its oxygen supply, rather than cooling it like water does.',
-  "Bengaluru's Fire & Emergency Services responds to thousands of calls every year — many for entirely preventable electrical fires.",
+  'Electrical faults are among the most common causes of fire incidents in Indian cities — many are preventable with regular inspection.',
   'A single overloaded extension board is one of the most common fire hazards found in Indian homes and small offices.',
   'Fire doors are specifically engineered to hold back flames for a set duration (often 30–120 minutes) to allow safe evacuation.',
-  'India loses thousands of lives annually to fire-related incidents, a large share of which fire-safety awareness could help prevent.',
+  'Fire safety awareness — checking wiring, keeping exits clear, testing alarms — is one of the simplest ways to reduce entirely preventable incidents at home.',
   'A greasy kitchen exhaust hood is dramatically more flammable than a regularly cleaned one — grease itself burns readily.',
   'Battery-related fires (from damaged lithium-ion batteries) are a fast-growing hazard category worldwide, including in India.',
 ];
@@ -79,18 +79,18 @@ function FunFactCard() {
   }
 
   return (
-    <div className="flex items-start gap-3 border border-ink bg-paper-2 p-5">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-ember/30 bg-ember-soft text-ember">
-        <Lightbulb size={18} />
+    <div className="flex items-start gap-4 border-2 border-ink bg-paper-2 p-6">
+      <span className="flex h-12 w-12 shrink-0 items-center justify-center border border-ember/30 bg-ember-soft text-ember">
+        <Lightbulb size={22} />
       </span>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
-          <div className="font-mono text-[10.5px] font-semibold uppercase tracking-wide text-ink/45">Fun Fact / Tip</div>
+          <div className="font-mono text-[10.5px] font-semibold uppercase tracking-wide text-ember-2">Fun Fact / Tip</div>
           <button onClick={shuffleFact} title="Show another fact" className="text-ink/40 hover:text-ember">
-            <RefreshCw size={13} />
+            <RefreshCw size={14} />
           </button>
         </div>
-        <p className="mt-1 text-[13.5px] leading-relaxed text-ink">{fact}</p>
+        <p className="mt-1.5 font-display text-[19px] font-semibold leading-snug text-ink sm:text-[21px]">{fact}</p>
       </div>
     </div>
   );
@@ -286,7 +286,7 @@ function SuggestionsModal({ onClose }: { onClose: () => void }) {
             <>
               <p className="mb-4 flex items-start gap-2 text-[12.5px] leading-relaxed text-ink/55">
                 <Globe2 size={14} className="mt-0.5 shrink-0 text-ember" />
-                FireWatch started right here in Bengaluru — the goal is to prove this accountability model works, then
+                FireWatch started right here in Bengaluru — the goal is to prove this transparency model works, then
                 take it to more Indian cities, and eventually beyond.
               </p>
               <form onSubmit={submit}>
@@ -417,7 +417,7 @@ export default function QuizPage() {
         </div>
       </div>
 
-      <section className="mx-auto max-w-[760px] space-y-6 px-6 py-10">
+      <section className="mx-auto max-w-[960px] space-y-6 px-6 py-10">
         <FunFactCard />
         <SelfAssessment />
       </section>

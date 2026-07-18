@@ -13,8 +13,8 @@ import { computeLocalityStats } from '../lib/scoring';
 const HOW_IT_WORKS = [
   { icon: Camera, title: 'Spot it', body: 'See a hazard — hanging wires, blocked exit, open burning. Photograph it in under 60 seconds.' },
   { icon: Megaphone, title: 'Report it', body: 'Your report is pinned to the exact locality and routed to the right authority automatically.' },
-  { icon: ClipboardCheck, title: 'Officer verifies', body: 'An on-duty officer reviews it and sends a ticket to BESCOM, BBMP, or the Fire Department.' },
-  { icon: Clock3, title: 'Tracked publicly', body: 'Every report carries a 48-hour clock. Overdue ones show up on the public Accountability page.' },
+  { icon: ClipboardCheck, title: 'Officer reviews', body: 'An on-duty officer reviews it and sends a ticket to BESCOM, BBMP, or the Fire Department.' },
+  { icon: Clock3, title: 'Tracked transparently', body: 'Every report carries a 48-hour target. Progress shows up on the public Transparency page.' },
 ];
 
 export default function HomePage() {
@@ -44,8 +44,8 @@ export default function HomePage() {
             Know how fire-safe your neighborhood really is.
           </h1>
           <p className="mx-auto mt-4 max-w-[640px] text-[16px] leading-relaxed text-ink/60 sm:text-[18px]">
-            FireWatch turns resident reports into public pressure — a live risk map of Bengaluru, a 60-second way
-            to flag a hazard, and a public record of whether the authorities actually fixed it.
+            FireWatch brings transparency to fire safety in Bengaluru — a live risk map, a 60-second way
+            to flag a hazard, and an open record of how each report is progressing.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
@@ -103,7 +103,7 @@ export default function HomePage() {
 
           <Link to="/heatmap" className="group relative block h-[420px] overflow-hidden border border-ink shadow-sm">
             <div className="pointer-events-none absolute inset-0 z-[25]">
-              <HeatmapMap stats={allStats} selectedId={previewSelected} onSelect={setPreviewSelected} mode="markers" />
+              <HeatmapMap stats={allStats} selectedId={previewSelected} onSelect={setPreviewSelected} mode="markers" zoom={10} />
             </div>
             <div className="absolute inset-0 z-[26] flex items-center justify-center bg-ink/0 transition-colors group-hover:bg-ink/10">
               <span className="translate-y-2 bg-ink px-5 py-2.5 font-display text-[13px] font-semibold uppercase tracking-wide text-paper opacity-0 shadow-lg transition-all group-hover:translate-y-0 group-hover:opacity-100">
@@ -184,10 +184,10 @@ export default function HomePage() {
             <Link to="/accountability" className="group flex flex-col justify-between border border-ink bg-paper p-6 shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-md">
               <div>
                 <span className="flex h-11 w-11 items-center justify-center border border-ink bg-ink text-paper"><ShieldCheck size={19} /></span>
-                <h3 className="mt-4 font-display text-[20px] font-bold uppercase text-ink">Department Accountability</h3>
+                <h3 className="mt-4 font-display text-[20px] font-bold uppercase text-ink">Department Transparency</h3>
                 <p className="mt-2 text-[13.5px] leading-relaxed text-ink/60">
-                  See exactly how BESCOM, BBMP, and the Fire Department are performing — reports routed, resolved,
-                  and overdue, in the open.
+                  See how reports to BESCOM, BBMP, and the Fire Department are progressing — routed, resolved,
+                  and pending, in the open.
                 </p>
               </div>
               <span className="mt-5 flex items-center gap-1.5 font-mono text-[12px] font-semibold uppercase tracking-wide text-ember">
