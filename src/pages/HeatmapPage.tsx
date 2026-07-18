@@ -10,6 +10,7 @@ import { useHazardStore } from '../lib/store';
 import { localities } from '../lib/data/localities';
 import { computeLocalityStats, riskBandMeta, type RiskBand } from '../lib/scoring';
 import { haversineKm } from '../lib/geo';
+import { logSearch } from '../lib/api';
 
 const BLR_CENTER = { lat: 12.9716, lng: 77.5946 };
 
@@ -101,9 +102,10 @@ export default function HeatmapPage() {
   async function handleSearchSubmit() {
     const q = search.trim();
     if (!q) return;
-    const hasDirectMatch = allStats.some((s) => s.locality.name.toLowerCase().includes(q.toLowerCase()));
-    if (hasDirectMatch) {
+    const directMatch = allStats.find((s) => s.locality.name.toLowerCase().includes(q.toLowerCase()));
+    if (directMatch) {
       setSearchNote(null);
+      logSearch({ query: q, matchedLocality: directMatch.locality.name });
       return;
     }
     setSearching(true);
@@ -116,11 +118,13 @@ export default function HeatmapPage() {
       const results: { lat: string; lon: string }[] = await res.json();
       if (!results.length) {
         setSearchNote(`No place found for "${q}". Try a locality, road, or landmark name.`);
+        logSearch({ query: q, notFound: true });
         return;
       }
       const point = { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
       if (haversineKm(point, BLR_CENTER) > 45) {
         setSearchNote(`"${q}" is outside Bengaluru — FireWatch only scores Bengaluru localities right now.`);
+        logSearch({ query: q, outsideBengaluru: true });
         return;
       }
       let best = allStats[0];
@@ -137,6 +141,7 @@ export default function HeatmapPage() {
       setSearchNote(
         `"${q}" isn't a scored area yet — showing the closest scored locality: ${best.locality.name} (${bestKm.toFixed(1)} km away).`,
       );
+      logSearch({ query: q, fallbackLocality: best.locality.name, fallbackKm: bestKm });
     } catch {
       setSearchNote('Could not look up that address right now. Check your connection and try again.');
     } finally {

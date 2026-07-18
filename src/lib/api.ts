@@ -105,3 +105,23 @@ export function submitPollAnswer(questionId: string, answer: 'yes' | 'no'): Prom
     body: JSON.stringify({ questionId, answer }),
   }).then((res) => json(res)).then(() => undefined);
 }
+
+export interface SearchLogPayload {
+  query: string;
+  matchedLocality?: string;
+  fallbackLocality?: string;
+  fallbackKm?: number;
+  outsideBengaluru?: boolean;
+  notFound?: boolean;
+}
+
+/** Fire-and-forget: records what someone searched for on the heatmap, so we can see which
+ * areas aren't covered yet (e.g. "Cox Town" falling back to "Frazer Town") and prioritize
+ * adding them. Never throws — a logging failure shouldn't affect the search itself. */
+export function logSearch(payload: SearchLogPayload): void {
+  fetch(`${API_BASE}/api/search-log`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(() => {});
+}

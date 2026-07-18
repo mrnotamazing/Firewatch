@@ -172,6 +172,46 @@ app.get('/api/poll', (_req, res) => {
   res.json(result);
 });
 
+app.post('/api/search-log', (req, res) => {
+  const { query, matchedLocality, fallbackLocality, fallbackKm, outsideBengaluru, notFound } = req.body;
+  if (!query || !query.trim()) {
+    res.status(400).json({ error: 'query is required' });
+    return;
+  }
+  const id = `SEARCH-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  db.prepare(
+    'INSERT INTO search_logs (id, query, matchedLocality, fallbackLocality, fallbackKm, outsideBengaluru, notFound, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+  ).run(
+    id,
+    query.trim().slice(0, 200),
+    matchedLocality ?? null,
+    fallbackLocality ?? null,
+    fallbackKm ?? null,
+    outsideBengaluru ? 1 : 0,
+    notFound ? 1 : 0,
+    Date.now(),
+  );
+  res.status(201).json({ ok: true });
+});
+
+// Officer-only: surfaces which searched areas aren't covered yet (grouped, most-searched
+// first) so we know what localities to prioritize adding in future patches.
+app.get('/api/search-log', requireOfficer, (_req, res) => {
+  const unmatched = db
+    .prepare(
+      `SELECT LOWER(TRIM(query)) as query, COUNT(*) as count, MAX(createdAt) as lastSearchedAt,
+         GROUP_CONCAT(DISTINCT fallbackLocality) as fallbackLocalities
+       FROM search_logs
+       WHERE matchedLocality IS NULL
+       GROUP BY LOWER(TRIM(query))
+       ORDER BY count DESC, lastSearchedAt DESC
+       LIMIT 100`,
+    )
+    .all();
+  const recent = db.prepare('SELECT * FROM search_logs ORDER BY createdAt DESC LIMIT 50').all();
+  res.json({ unmatched, recent });
+});
+
 // Serve the built frontend (dist/) when it exists, so one always-on process hosts the whole app.
 const distDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist');
 if (existsSync(distDir)) {

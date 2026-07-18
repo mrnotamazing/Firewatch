@@ -48,6 +48,22 @@ db.exec(`
   )
 `);
 
+// Logs every locality/address search on the heatmap so we can see what areas people
+// look for that FireWatch doesn't cover yet (e.g. "Cox Town" falling back to the
+// nearest scored locality, "Frazer Town") and prioritize adding them in future patches.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS search_logs (
+    id TEXT PRIMARY KEY,
+    query TEXT NOT NULL,
+    matchedLocality TEXT,
+    fallbackLocality TEXT,
+    fallbackKm REAL,
+    outsideBengaluru INTEGER NOT NULL DEFAULT 0,
+    notFound INTEGER NOT NULL DEFAULT 0,
+    createdAt INTEGER NOT NULL
+  )
+`);
+
 export function rowToReport(row) {
   return {
     id: row.id,
