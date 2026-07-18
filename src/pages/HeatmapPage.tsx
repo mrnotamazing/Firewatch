@@ -198,7 +198,7 @@ export default function HeatmapPage() {
 
       <div className="border-b border-ink bg-paper-2 px-4 py-6 sm:px-10 sm:py-10 lg:px-16">
       <div className="relative mx-auto h-[70vh] min-h-[480px] w-full max-w-[1400px] border border-ink shadow-md">
-        <HeatmapMap stats={filteredStats} selectedId={selectedId} onSelect={handleSelect} mode={mapMode} />
+        <HeatmapMap stats={filteredStats} selectedId={selectedId} onSelect={handleSelect} mode={mapMode} zoom={12} />
 
         {controlsOpen ? (
           <div className="animate-pop-in absolute left-14 top-3 z-[20] w-[260px] space-y-1.5 sm:w-[300px]" style={{ transform: 'translateZ(0)' }}>
