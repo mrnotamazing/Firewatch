@@ -394,31 +394,31 @@ export default function HeatmapPage() {
         <div className="max-h-[640px] overflow-auto border border-ink">
           <table className="w-full min-w-[720px] border-collapse text-left">
             <thead className="sticky top-0 z-10">
-              <tr className="border-b border-ink/10 bg-white/70 font-display text-[13px] uppercase tracking-wide text-ink shadow-[0_1px_12px_rgba(15,15,15,0.08)] backdrop-blur-xl sm:text-[14px]">
+              <tr className="border-b border-ink/10 bg-white/70 font-display text-[14px] uppercase tracking-wide text-ink shadow-[0_1px_12px_rgba(15,15,15,0.08)] backdrop-blur-xl sm:text-[16px]">
                 <th
-                  className="cursor-pointer select-none px-4 py-4 font-bold transition-colors"
+                  className="cursor-pointer select-none px-5 py-5 font-bold transition-colors"
                   onClick={() => toggleSort('score')}
                 >
-                  <span className={`inline-flex items-center gap-1.5 border-b-2 pb-0.5 transition-colors ${sortKey === 'score' ? 'border-ember text-ember' : 'border-transparent text-ink/55 hover:text-ink'}`}>
-                    Score <ArrowUpDown size={13} className={sortKey === 'score' ? 'text-ember' : 'text-ink/25'} />
+                  <span className={`inline-flex items-center gap-2 border-b-2 pb-1 transition-colors ${sortKey === 'score' ? 'border-ember text-ember' : 'border-transparent text-ink/55 hover:text-ink'}`}>
+                    Score <ArrowUpDown size={15} className={sortKey === 'score' ? 'text-ember' : 'text-ink/25'} />
                   </span>
                 </th>
                 <th
-                  className="cursor-pointer select-none px-4 py-4 font-bold transition-colors"
+                  className="cursor-pointer select-none px-5 py-5 font-bold transition-colors"
                   onClick={() => toggleSort('name')}
                 >
-                  <span className={`inline-flex items-center gap-1.5 border-b-2 pb-0.5 transition-colors ${sortKey === 'name' ? 'border-ember text-ember' : 'border-transparent text-ink/55 hover:text-ink'}`}>
-                    Locality <ArrowUpDown size={13} className={sortKey === 'name' ? 'text-ember' : 'text-ink/25'} />
+                  <span className={`inline-flex items-center gap-2 border-b-2 pb-1 transition-colors ${sortKey === 'name' ? 'border-ember text-ember' : 'border-transparent text-ink/55 hover:text-ink'}`}>
+                    Locality <ArrowUpDown size={15} className={sortKey === 'name' ? 'text-ember' : 'text-ink/25'} />
                   </span>
                 </th>
-                <th className="px-2 py-2.5">
-                  <div className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 backdrop-blur-md transition-colors ${typeFilter !== 'All Types' ? 'border-ember/30 bg-ember-soft text-ember' : 'border-ink/10 bg-white/50 text-ink/55'}`}>
-                    <Filter size={12} className="shrink-0" />
+                <th className="px-2 py-3">
+                  <div className={`flex items-center gap-2 rounded-full border px-3.5 py-2 backdrop-blur-md transition-colors ${typeFilter !== 'All Types' ? 'border-ember/30 bg-ember-soft text-ember' : 'border-ink/10 bg-white/50 text-ink/55'}`}>
+                    <Filter size={13} className="shrink-0" />
                     <select
                       value={typeFilter}
                       onChange={(e) => setTypeFilter(e.target.value as typeof typeFilter)}
                       onClick={(e) => e.stopPropagation()}
-                      className="w-full cursor-pointer bg-transparent font-display text-[12.5px] font-bold uppercase tracking-wide focus:outline-none"
+                      className="w-full cursor-pointer bg-transparent font-display text-[13.5px] font-bold uppercase tracking-wide focus:outline-none"
                     >
                       {TYPE_FILTERS.map((t) => (
                         <option key={t} value={t} className="text-ink">{t === 'All Types' ? 'Type' : `${t[0].toUpperCase()}${t.slice(1)}`}</option>
@@ -426,16 +426,16 @@ export default function HeatmapPage() {
                     </select>
                   </div>
                 </th>
-                <th className="px-4 py-4 font-bold text-ink/55">Active</th>
-                <th className="px-4 py-4 font-bold text-ink/55">Pending</th>
-                <th className="px-2 py-2.5">
-                  <div className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 backdrop-blur-md transition-colors ${riskFilter !== 'all' ? 'border-ember/30 bg-ember-soft text-ember' : 'border-ink/10 bg-white/50 text-ink/55'}`}>
-                    <Filter size={12} className="shrink-0" />
+                <th className="px-5 py-5 font-bold text-ink/55">Active</th>
+                <th className="px-5 py-5 font-bold text-ink/55">Pending</th>
+                <th className="px-2 py-3">
+                  <div className={`flex items-center gap-2 rounded-full border px-3.5 py-2 backdrop-blur-md transition-colors ${riskFilter !== 'all' ? 'border-ember/30 bg-ember-soft text-ember' : 'border-ink/10 bg-white/50 text-ink/55'}`}>
+                    <Filter size={13} className="shrink-0" />
                     <select
                       value={riskFilter}
                       onChange={(e) => setRiskFilter(e.target.value as RiskBand | 'all')}
                       onClick={(e) => e.stopPropagation()}
-                      className="w-full cursor-pointer bg-transparent font-display text-[12.5px] font-bold uppercase tracking-wide focus:outline-none"
+                      className="w-full cursor-pointer bg-transparent font-display text-[13.5px] font-bold uppercase tracking-wide focus:outline-none"
                     >
                       <option value="all" className="text-ink">Risk Band</option>
                       {RISK_FILTERS.filter((r) => r.id !== 'all').map((r) => (

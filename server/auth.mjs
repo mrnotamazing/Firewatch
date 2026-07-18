@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 // Shared officer passcode for this pilot deployment. Override with a real value via env var
 // before deploying anywhere beyond localhost — this default is only here so the demo works out
 // of the box.
-const OFFICER_PASSCODE = process.env.OFFICER_PASSCODE || 'firewatch-2026';
+const OFFICER_PASSCODE = process.env.OFFICER_PASSCODE || 'firefirefire';
 
 const SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12h shift-length session
 const sessions = new Map(); // token -> expiresAt
