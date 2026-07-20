@@ -3,12 +3,14 @@ import cors from 'cors';
 import { existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { db, rowToReport } from './db.mjs';
+import { run, get, all, initSchema, rowToReport } from './db.mjs';
 import { checkPasscode, createSession, isValidSession, destroySession, requireOfficer } from './auth.mjs';
 import { sendTicketEmail } from './mailer.mjs';
 import { hazardCategoryMap } from './hazardCategories.mjs';
 import { localityNames } from './localityNames.mjs';
 import { contactFor } from './departmentContacts.mjs';
+
+await initSchema();
 
 const app = express();
 app.use(cors());
@@ -38,39 +40,40 @@ app.post('/api/officer/logout', (req, res) => {
   res.json({ ok: true });
 });
 
-function nextReportId() {
-  const rows = db.prepare('SELECT id FROM reports').all();
+async function nextReportId() {
+  const rows = await all('SELECT id FROM reports');
   const nums = rows.map((r) => Number(r.id.replace('BLR-', ''))).filter((n) => !Number.isNaN(n));
   const max = nums.length ? Math.max(...nums) : 10233;
   return `BLR-${max + 1}`;
 }
 
-app.get('/api/reports', (_req, res) => {
-  const rows = db.prepare('SELECT * FROM reports ORDER BY createdAt DESC').all();
+app.get('/api/reports', async (_req, res) => {
+  const rows = await all('SELECT * FROM reports ORDER BY createdAt DESC');
   res.json(rows.map(rowToReport));
 });
 
-app.post('/api/reports', (req, res) => {
+app.post('/api/reports', async (req, res) => {
   const { category, localityId, description, photoDataUrl, reporterName, reporterContact } = req.body;
   if (!category || !localityId || !description || !reporterName) {
     res.status(400).json({ error: 'Missing required fields' });
     return;
   }
-  const id = nextReportId();
+  const id = await nextReportId();
   const createdAt = Date.now();
   const dueAt = createdAt + 48 * HOUR;
   const status = 'pending';
 
-  db.prepare(`
-    INSERT INTO reports (id, category, localityId, description, photoDataUrl, reporterName, reporterContact, status, createdAt, dueAt, resolvedAt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
-  `).run(id, category, localityId, description, photoDataUrl ?? null, reporterName, reporterContact ?? null, status, createdAt, dueAt);
+  await run(
+    `INSERT INTO reports (id, category, localityId, description, photoDataUrl, reporterName, reporterContact, status, createdAt, dueAt, resolvedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)`,
+    [id, category, localityId, description, photoDataUrl ?? null, reporterName, reporterContact ?? null, status, createdAt, dueAt],
+  );
 
-  const row = db.prepare('SELECT * FROM reports WHERE id = ?').get(id);
+  const row = await get('SELECT * FROM reports WHERE id = ?', [id]);
   res.status(201).json(rowToReport(row));
 });
 
-app.patch('/api/reports/:id', requireOfficer, (req, res) => {
+app.patch('/api/reports/:id', requireOfficer, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   const valid = ['pending', 'assigned', 'in-progress', 'resolved', 'escalated'];
@@ -78,20 +81,20 @@ app.patch('/api/reports/:id', requireOfficer, (req, res) => {
     res.status(400).json({ error: 'Invalid status' });
     return;
   }
-  const existing = db.prepare('SELECT * FROM reports WHERE id = ?').get(id);
+  const existing = await get('SELECT * FROM reports WHERE id = ?', [id]);
   if (!existing) {
     res.status(404).json({ error: 'Report not found' });
     return;
   }
   const resolvedAt = status === 'resolved' ? Date.now() : null;
-  db.prepare('UPDATE reports SET status = ?, resolvedAt = ? WHERE id = ?').run(status, resolvedAt, id);
-  const row = db.prepare('SELECT * FROM reports WHERE id = ?').get(id);
+  await run('UPDATE reports SET status = ?, resolvedAt = ? WHERE id = ?', [status, resolvedAt, id]);
+  const row = await get('SELECT * FROM reports WHERE id = ?', [id]);
   res.json(rowToReport(row));
 });
 
 app.post('/api/reports/:id/send-ticket', requireOfficer, async (req, res) => {
   const { id } = req.params;
-  const report = db.prepare('SELECT * FROM reports WHERE id = ?').get(id);
+  const report = await get('SELECT * FROM reports WHERE id = ?', [id]);
   if (!report) {
     res.status(404).json({ error: 'Report not found' });
     return;
@@ -128,12 +131,12 @@ app.post('/api/reports/:id/send-ticket', requireOfficer, async (req, res) => {
   const result = await sendTicketEmail({ to: recipient, subject, text });
 
   const ticketSentAt = Date.now();
-  db.prepare('UPDATE reports SET ticketSentAt = ?, ticketRecipient = ? WHERE id = ?').run(ticketSentAt, recipient, id);
+  await run('UPDATE reports SET ticketSentAt = ?, ticketRecipient = ? WHERE id = ?', [ticketSentAt, recipient, id]);
 
   res.json({ sentAt: ticketSentAt, recipient, simulated: result.simulated });
 });
 
-app.post('/api/suggestions', (req, res) => {
+app.post('/api/suggestions', async (req, res) => {
   const { message } = req.body;
   if (!message || !message.trim()) {
     res.status(400).json({ error: 'Message is required' });
@@ -142,73 +145,77 @@ app.post('/api/suggestions', (req, res) => {
   const id = `SUG-${Date.now()}`;
   const createdAt = Date.now();
   const trimmed = message.trim().slice(0, 2000);
-  db.prepare('INSERT INTO suggestions (id, message, createdAt) VALUES (?, ?, ?)').run(id, trimmed, createdAt);
+  await run('INSERT INTO suggestions (id, message, createdAt) VALUES (?, ?, ?)', [id, trimmed, createdAt]);
   res.status(201).json({ id, message: trimmed, createdAt });
 });
 
-app.get('/api/suggestions', requireOfficer, (_req, res) => {
-  const rows = db.prepare('SELECT * FROM suggestions ORDER BY createdAt DESC').all();
+app.get('/api/suggestions', requireOfficer, async (_req, res) => {
+  const rows = await all('SELECT * FROM suggestions ORDER BY createdAt DESC');
   res.json(rows);
 });
 
-app.post('/api/poll', (req, res) => {
+app.post('/api/poll', async (req, res) => {
   const { questionId, answer } = req.body;
   if (!questionId || (answer !== 'yes' && answer !== 'no')) {
     res.status(400).json({ error: 'questionId and answer ("yes" or "no") are required' });
     return;
   }
   const id = `POLL-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  db.prepare('INSERT INTO poll_responses (id, questionId, answer, createdAt) VALUES (?, ?, ?, ?)').run(id, questionId, answer, Date.now());
+  await run('INSERT INTO poll_responses (id, questionId, answer, createdAt) VALUES (?, ?, ?, ?)', [
+    id,
+    questionId,
+    answer,
+    Date.now(),
+  ]);
   res.status(201).json({ ok: true });
 });
 
-app.get('/api/poll', (_req, res) => {
-  const rows = db.prepare('SELECT questionId, answer, COUNT(*) as count FROM poll_responses GROUP BY questionId, answer').all();
+app.get('/api/poll', async (_req, res) => {
+  const rows = await all('SELECT questionId, answer, COUNT(*) as count FROM poll_responses GROUP BY questionId, answer');
   const result = {};
   for (const r of rows) {
     if (!result[r.questionId]) result[r.questionId] = { yes: 0, no: 0 };
-    result[r.questionId][r.answer] = r.count;
+    result[r.questionId][r.answer] = Number(r.count);
   }
   res.json(result);
 });
 
-app.post('/api/search-log', (req, res) => {
+app.post('/api/search-log', async (req, res) => {
   const { query, matchedLocality, fallbackLocality, fallbackKm, outsideBengaluru, notFound } = req.body;
   if (!query || !query.trim()) {
     res.status(400).json({ error: 'query is required' });
     return;
   }
   const id = `SEARCH-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  db.prepare(
+  await run(
     'INSERT INTO search_logs (id, query, matchedLocality, fallbackLocality, fallbackKm, outsideBengaluru, notFound, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-  ).run(
-    id,
-    query.trim().slice(0, 200),
-    matchedLocality ?? null,
-    fallbackLocality ?? null,
-    fallbackKm ?? null,
-    outsideBengaluru ? 1 : 0,
-    notFound ? 1 : 0,
-    Date.now(),
+    [
+      id,
+      query.trim().slice(0, 200),
+      matchedLocality ?? null,
+      fallbackLocality ?? null,
+      fallbackKm ?? null,
+      outsideBengaluru ? 1 : 0,
+      notFound ? 1 : 0,
+      Date.now(),
+    ],
   );
   res.status(201).json({ ok: true });
 });
 
 // Officer-only: surfaces which searched areas aren't covered yet (grouped, most-searched
 // first) so we know what localities to prioritize adding in future patches.
-app.get('/api/search-log', requireOfficer, (_req, res) => {
-  const unmatched = db
-    .prepare(
-      `SELECT LOWER(TRIM(query)) as query, COUNT(*) as count, MAX(createdAt) as lastSearchedAt,
-         GROUP_CONCAT(DISTINCT fallbackLocality) as fallbackLocalities
-       FROM search_logs
-       WHERE matchedLocality IS NULL
-       GROUP BY LOWER(TRIM(query))
-       ORDER BY count DESC, lastSearchedAt DESC
-       LIMIT 100`,
-    )
-    .all();
-  const recent = db.prepare('SELECT * FROM search_logs ORDER BY createdAt DESC LIMIT 50').all();
+app.get('/api/search-log', requireOfficer, async (_req, res) => {
+  const unmatched = await all(
+    `SELECT LOWER(TRIM(query)) as query, COUNT(*) as count, MAX(createdAt) as lastSearchedAt,
+       GROUP_CONCAT(DISTINCT fallbackLocality) as fallbackLocalities
+     FROM search_logs
+     WHERE matchedLocality IS NULL
+     GROUP BY LOWER(TRIM(query))
+     ORDER BY count DESC, lastSearchedAt DESC
+     LIMIT 100`,
+  );
+  const recent = await all('SELECT * FROM search_logs ORDER BY createdAt DESC LIMIT 50');
   res.json({ unmatched, recent });
 });
 
