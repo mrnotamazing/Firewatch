@@ -1,0 +1,15 @@
+name: Keep Render backend alive
+
+on:
+  schedule:
+    # Every 10 minutes — Render's free tier spins down after ~15 min idle,
+    # so this keeps the API warm and avoids cold-start delays for users.
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping backend
+        run: curl -fsS --max-time 30 https://firewatch-vvt2.onrender.com/api/reports > /dev/null
